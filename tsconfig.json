@@ -6,7 +6,9 @@
         "esModuleInterop": true,
         "skipLibCheck": true,
         "forceConsistentCasingInFileNames": true,
-        "outDir": "ts-output"
+        "outDir": "ts-output",
+        "jsxFactory": "createTree"
+        // "jsxImportSource": "./api/index"
     },
     "include": ["src/**/*.ts"]
 }
