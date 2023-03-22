@@ -10,7 +10,7 @@ const Parent = (props, branches) => {
     };
 };
 
-const Child = function* (props, branches) {
+const Child = async function* (props, branches) {
     console.log(props);
     let result = yield { name: props.name + " cole" };
     console.log(result.age);
@@ -25,6 +25,7 @@ const el = (
         </Child>
     </Parent>
 );
+
 el.init();
 // el.value.inherit.children.keys().next().value.click() //?
 // let el2 = <el.next /> //valid!!

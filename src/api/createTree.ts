@@ -74,9 +74,10 @@ export const createTree = <T extends Record<any, any>, U>(
         typeof source == "function"
             ? normalizeFn(source, props, branches as Unit<any, T>[])
             : normalizePrimitive(source, props, branches);
-    let hasParent = false;
     let nextBranch = (branch) => {
-        branch.next(root.value);
+        let value = Object.assign(branch.root.parent || {}, root.value);
+        //this should handle it? it updates the parent then passes it to the branch
+        branch.next(value);
         return branch;
     };
     const updateBranches = () => {
@@ -90,23 +91,21 @@ export const createTree = <T extends Record<any, any>, U>(
     // } else {
     //     branches = updateBranches();
     // }
-    // mapper = (branch) => {
-    //     branch.next(root.value);
-    //     return branch;
-    // }; //swap mapper after initial run
-    const resolveProto = (root, parent) => {
-        if (root.parent)
-            return Object.assign(
-                Object.create(resolveProto(root.parent)),
-                root.value
-            );
-        return root.value;
-    };
+
+    // const resolveProto = (root, parent) => {
+    //     if (root.parent)
+    //         return Object.assign(
+    //             Object.create(resolveProto(root.parent)),
+    //             root.value
+    //         );
+    //     return root.value;
+    // };
     return (unit = {
         root,
         branches,
         next(props: U = {}) {
             let frame = root.next(props);
+            // console.log("the frame", frame);
             if (isPromise(frame)) {
                 return frame.then((frame) => {
                     updateBranches();
@@ -117,21 +116,25 @@ export const createTree = <T extends Record<any, any>, U>(
         },
         init() {
             console.log("initializing", root.value);
+            // if (root.future) {
+            //     return root.future.then(this.init.bind(this));
+            // }
             this.branches = branches = branches.map((branch) => {
                 if (branch?.next) {
-                    // root.parent = parent;
-                    // branch.init(root);
-                    // console.log(
-                    //     "root parent",
-                    //     root.value,
-                    //     resolveProto(branch)
-                    // );
                     branch.root.parent = root.parent
                         ? Object.assign(Object.create(root.parent), root.value)
                         : root.value;
-                    branch.init();
-                    console.log("after initial ", branch.root.parent);
-                    nextBranch(branch);
+                    // branch.init();
+                    // nextBranch(branch);
+                    let initializer = branch.init();
+                    if (isPromise(initializer)) {
+                        // initializer.then(() => {
+                        //     console.log("initializer");
+                        //     nextBranch(branch);
+                        // });
+                    } else {
+                        nextBranch(branch);
+                    }
                 } else {
                     branch = normalizeFn(branch, root.value, branches);
                     branch.parent = root;

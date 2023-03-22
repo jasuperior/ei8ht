@@ -144,7 +144,6 @@ export const normalizeFn = <T extends Record<any, any>, U>(
                 (value) => value.done
             );
             let next = (props: U) => {
-                console.log("next:   ", frame, state.parent);
                 if (frame.done) {
                     currentState = fn(props, branches, state);
                     currentState.parent = state.parent;
@@ -155,12 +154,13 @@ export const normalizeFn = <T extends Record<any, any>, U>(
                 return frame;
             };
             if (isPromise(frame)) {
-                future = frame.finally(setValue);
+                future = frame.then(setValue);
                 //provide default frame since frame is being awaited.
                 let setNextValue = next;
                 next = (props: U) => {
                     let nextValue = setNextValue.bind(null, props);
-                    state.future = future = state.future.finally((newFrame) => {
+                    state.future = future = state.future.then((newFrame) => {
+                        console.log("completing promise", newFrame);
                         if (Object.is(state.future, future))
                             state.future = undefined;
                         return nextValue(newFrame);
@@ -179,16 +179,14 @@ export const normalizeFn = <T extends Record<any, any>, U>(
                 (value) => value,
                 () => true
             );
-            state.future = future = (result as PromiseLike<T>).finally(
-                setValue
-            );
+            state.future = future = (result as PromiseLike<T>).then(setValue);
 
             state.next = (props: U = {}) => {
                 let nextValue = setNextValue.bind(null, props, setValue);
                 return (state.future = state.future
-                    ?.finally(nextValue)
+                    ?.then(nextValue)
                     .then((frame) => {
-                        // createPrototype(props);
+                        //should be one then
                         if (Object.is(state.future, future)) {
                             state.future = undefined;
                         }
