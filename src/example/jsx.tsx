@@ -3,33 +3,29 @@ import { Html } from "./html";
 
 const Parent = (props, branches) => {
     //this is getting called twice.
-    console.log(props?.inherit);
+    console.log(props);
     return {
         name: props?.prop + " hello",
+        age: 99,
     };
 };
 
 const Child = function* (props, branches) {
-    let [result, children] = yield { name: props.name + " cole" };
-    console.log(result);
-    yield { name: "dion" };
-    console.log("called again");
-    return { name: "finished" };
+    console.log(props);
+    let result = yield { name: props.name + " cole" };
+    console.log(result.age);
+    return { name: "finished " + props.name };
 };
-let el = (
-    <Html>
-        {/* <div hhello="something">
-            <div name="something" style="width: 10px;">
-                <div></div>
-            </div>
-        </div> */}
-        <Parent>
-            <main></main>
-        </Parent>
-        {/* <span></span> */}
-    </Html>
+
+const el = (
+    <Parent prop="jamel">
+        <Child name="something">
+            <Child name="other" extra></Child>
+            {/* {Child} */}
+        </Child>
+    </Parent>
 );
-el.value.body.innerHTML; //?
+el.init();
 // el.value.inherit.children.keys().next().value.click() //?
 // let el2 = <el.next /> //valid!!
 //how does this interface with html?

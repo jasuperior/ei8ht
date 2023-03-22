@@ -1,3 +1,4 @@
+export type Primitive = string | boolean | number;
 export type UnitResult<T extends Record<any, any>, U> =
     | T
     | PromiseLike<T>
@@ -25,6 +26,7 @@ export type UnitIterator<T, U extends any = any> = {
     type: UnitType;
     value: T;
     future?: PromiseLike<UnitFrame<T>>;
+    parent?: Unit<any, any>;
     next(value: U): UnitFrame<T> | PromiseLike<UnitFrame<T>>;
     [Symbol.iterator]: Iterable<T>;
     [Symbol.asyncIterator]: PromiseLike<Iterable<T>>;
@@ -32,4 +34,6 @@ export type UnitIterator<T, U extends any = any> = {
 export type Unit<T, U = any> = {
     root: UnitIterator<T, U>;
     branches: Unit<any, T>[];
+    next(value: U): UnitFrame<T> | PromiseLike<UnitFrame<T>>;
+    init(): void;
 };

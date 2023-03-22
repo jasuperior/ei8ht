@@ -116,12 +116,18 @@ export const normalizeFn = <T extends Record<any, any>, U>(
     let result = fn(props, branches, state);
     let future: PromiseLike<UnitFrame<T>> | undefined;
     let frame: UnitFrame<T, U>;
+    const createPrototype = (props: U) => {
+        if (frame.value)
+            frame.value = Object.assign(Object.create(props), frame.value);
+    };
     const makeSetValue = (getValue, getDone = () => true) => {
         return (value: T) => {
-            state.value = getValue(value);
+            let done = getDone(value);
+            value = getValue(value);
+            state.value = value;
             return (frame = {
-                value: getValue(value),
-                done: getDone(value),
+                value,
+                done,
             });
         };
     };
@@ -131,26 +137,32 @@ export const normalizeFn = <T extends Record<any, any>, U>(
     switch (true) {
         case isGenerator(result): {
             frame = result.next();
-            let currentState = state; //state resets when its done.
+            let currentState = result; //state resets when its done.
+            result = frame.value;
             const setValue = makeSetValue(
-                getValue(
-                    (value) => value.value,
-                    (value) => value.done
-                )
+                (value) => value.value,
+                (value) => value.done
             );
             let next = (props: U) => {
+                console.log("next:   ", frame, state.parent);
+                if (frame.done) {
+                    currentState = fn(props, branches, state);
+                    currentState.parent = state.parent;
+                }
                 frame = currentState.next(props); //branches and state done change.
+                // createPrototype(props);
                 setValue(frame);
+                return frame;
             };
             if (isPromise(frame)) {
                 future = frame.finally(setValue);
                 //provide default frame since frame is being awaited.
+                let setNextValue = next;
                 next = (props: U) => {
-                    let nextValue = setNextValue.bind(null, props, setValue);
-                    state.future = state.future.finally((newFrame) => {
-                        if (frame.done) {
-                            currentState = fn(props, branches, state);
-                        }
+                    let nextValue = setNextValue.bind(null, props);
+                    state.future = future = state.future.finally((newFrame) => {
+                        if (Object.is(state.future, future))
+                            state.future = undefined;
                         return nextValue(newFrame);
                     });
                 };
@@ -159,47 +171,58 @@ export const normalizeFn = <T extends Record<any, any>, U>(
                     done: false,
                 };
             }
-
             state.next = next;
+            break;
         }
         case isPromise(result): {
             const setValue = makeSetValue(
-                getValue(
-                    (value) => value,
-                    (value) => true
-                )
+                (value) => value,
+                () => true
             );
-            future = (result as PromiseLike<T>).finally(setValue);
+            state.future = future = (result as PromiseLike<T>).finally(
+                setValue
+            );
 
             state.next = (props: U = {}) => {
                 let nextValue = setNextValue.bind(null, props, setValue);
-                return (state.future = state.future?.finally(nextValue));
+                return (state.future = state.future
+                    ?.finally(nextValue)
+                    .then((frame) => {
+                        // createPrototype(props);
+                        if (Object.is(state.future, future)) {
+                            state.future = undefined;
+                        }
+                        return frame;
+                    }));
             };
+            break;
         }
         default: {
-            state = Object.assign(state, {
-                value: result,
-                future,
-                next:
-                    state.next ||
-                    ((props: U = {}) => {
-                        state.value = fn(props, branches, state) as T;
-                        return {
-                            value: state.value,
-                            done: true,
-                        };
-                    }),
-            });
         }
     }
 
+    state = Object.assign(state, {
+        value: result,
+        future,
+        next:
+            state.next ||
+            ((props: U = {}) => {
+                state.value = fn(props, branches, state) as T;
+                frame = {
+                    value: state.value,
+                    done: true,
+                };
+                // createPrototype(props);
+                return frame;
+            }),
+    });
     return state;
 };
-export const normalizePrimitive = (
+export const normalizePrimitive = <T, U>(
     primitive: any,
     props: any = {},
     branches: any[] = []
-) => {
+): UnitIterator<T, U> => {
     let fn = () => {};
     const getInherited = (inherited: any = {}) => {
         switch (true) {
