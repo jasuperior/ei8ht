@@ -7,7 +7,7 @@
         "skipLibCheck": true,
         "forceConsistentCasingInFileNames": true,
         "outDir": "ts-output",
-        "jsxFactory": "createTree",
+        "jsxFactory": "createUnitTree",
         "jsx": "preserve"
         // "jsxImportSource": "./"
         // "jsxImportSource": "./api/index"
