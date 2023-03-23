@@ -1,32 +1,35 @@
 import { createUnitTree } from "../api/create/createUnitTree";
 import { chainLength } from "../api/helpers/DynamicPrototype";
 import { AsyncUnitMethod, UnitScope } from "../model/api.model";
-const Parent: AsyncUnitMethod<UnitScope, UnitScope> = async (
-    props,
-    branches
-) => {
+const Parent: AsyncUnitMethod<
+    UnitScope,
+    { prop: string; prop2: string }
+> = async (props, branches) => {
     //this is getting called twice.
-    console.log(props.year);
+    console.log(props);
     return {
         name: props?.prop + " hello",
         [props.prop2]: 99,
     };
 };
 
-const Child = function* (props, branches) {
+const Child = async function* (props, branches) {
     console.log(props.name);
-    let result = yield { name: props.name + " cole" };
-    console.log(result.prop2);
+    let result = yield { uuu: props.name + " cole" };
+    console.log(result.name);
     return { name: "finished " + props.name };
 };
 
 const el = (
     <Parent prop="jamel" prop2="age">
-        <Parent prop="jamel 2" prop2="year"></Parent>
+        <Child prop="jamel 2" juju="year"></Child>
     </Parent>
 );
 
 el.next({ prop: "breaking", prop2: "up" });
+// setTimeout(() => {
+//     el; //?
+// }, 1000);
 // el.branches[0].next({ prop: "breaking", morning: "brew" }); //?
 // el.value.inherit.children.keys().next().value.click() //?
 // let el2 = <el.next /> //valid!!

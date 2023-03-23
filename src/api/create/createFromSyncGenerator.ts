@@ -17,14 +17,14 @@ export const createFromSyncGenerator = <
     T extends UnitScope,
     U extends UnitScope
 >(
-    generator: Generator<T, T, U>,
+    generator: Generator<T | void, T | void, U>,
     fn: SyncUnitGenerator<T, U>,
     input: U,
     branches: UnitIterator<any, T>[] = []
 ): UnitIterator<T, U> => {
     let frame = generator.next();
-    let chain = prototype(frame.value);
-    let output = frame.value;
+    let chain = prototype(frame.value || {});
+    let output = frame.value || ({} as T);
     chain.push({});
     chain.push(input);
     branches.forEach((branch) => {
@@ -46,14 +46,14 @@ export const createFromSyncGenerator = <
                 generator = fn(chain as U, branches, this);
             }
             frame = generator.next(chain);
-            this.output = frame.value;
-            if (frame !== undefined) {
+            if (frame.value !== undefined) {
+                this.output = frame.value;
                 if (!chain[chainContains](frame.value)) {
                     //if the frame is a new object,
                     //it replaces the frame in the chain.
                     chain[replaceObj](0, frame.value);
                 }
-                branches.forEach((branch) => branch.next(frame.value));
+                branches.forEach((branch) => branch.next(frame.value as T));
             }
             return frame as UnitFrame<T>;
         },

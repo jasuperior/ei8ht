@@ -37,17 +37,17 @@ export const createFromSyncMethod = <T extends UnitScope, U extends UnitScope>(
             this.input = input;
             chain[replaceObj](1, input);
             let frame = fn(chain as U, branches, this);
-            this.output = frame;
             if (frame !== undefined) {
+                this.output = frame;
                 if (!chain[chainContains](frame)) {
                     //if the frame is a new object,
                     //it replaces the frame in the chain.
                     chain[replaceObj](0, frame);
                 }
-                branches.forEach((branch) => branch.next(frame));
+                branches.forEach((branch) => branch.next(frame as T));
             }
             return {
-                value: frame,
+                value: frame as T,
                 done: true,
             };
         },

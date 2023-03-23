@@ -27,12 +27,12 @@ export const createFromAsyncMethod = <T extends UnitScope, U extends UnitScope>(
         currentFuture: PromiseLike<UnitFrame<T>>,
         frame: T
     ): UnitFrame<T> => {
-        iterator.output = frame;
         if (Object.is(iterator.future, currentFuture)) {
             //erase future only if the current future is queued
             iterator.future = undefined;
         }
         if (frame !== undefined) {
+            iterator.output = frame;
             if (!chain[chainContains](frame)) {
                 chain[replaceObj](0, frame);
             }
@@ -69,12 +69,12 @@ export const createFromAsyncMethod = <T extends UnitScope, U extends UnitScope>(
                 future = this.future.then(
                     () =>
                         (this.future = fn(chain, branches, this).then((value) =>
-                            setNextValue(future, value)
+                            setNextValue(future, value as T)
                         ))
                 );
             } else {
                 future = this.future = fn(chain, branches, this).then((value) =>
-                    setNextValue(future, value)
+                    setNextValue(future, value as T)
                 );
             }
             return future;
