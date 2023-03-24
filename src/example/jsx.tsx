@@ -6,23 +6,26 @@ const Parent: AsyncUnitMethod<
     { prop: string; prop2: string }
 > = async (props, branches) => {
     //this is getting called twice.
-    console.log(props);
+
     return {
-        name: props?.prop + " hello",
-        [props.prop2]: 99,
+        div(props, branches) {
+            console.log(props);
+            return { age: 323 };
+        },
     };
 };
 
 const Child = async function* (props, branches) {
     console.log(props.name);
     let result = yield { uuu: props.name + " cole" };
-    console.log(result.name);
+    console.log(result.prop);
     return { name: "finished " + props.name };
 };
 
 const el = (
     <Parent prop="jamel" prop2="age">
-        <Child prop="jamel 2" juju="year"></Child>
+        <div></div>
+        <Child name="hello" />
     </Parent>
 );
 

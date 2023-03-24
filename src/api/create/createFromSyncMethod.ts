@@ -44,7 +44,8 @@ export const createFromSyncMethod = <T extends UnitScope, U extends UnitScope>(
                     //it replaces the frame in the chain.
                     chain[replaceObj](0, frame);
                 }
-                branches.forEach((branch) => branch.next(frame as T));
+                branches.forEach((branch) => branch.next(chain as T));
+                //! should be passing chain if I want the value to propograte
             }
             return {
                 value: frame as T,

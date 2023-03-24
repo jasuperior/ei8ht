@@ -46,6 +46,14 @@ export enum UnitType {
     SYNC,
     ASYNC,
 }
+
+/**
+ * !NOTE: Iterators should maybe be called Monads
+ *
+ * !NOTE: Iterators should maybe have a 'return' method, which returns the generator,
+ * !and resets the cursor to instantiation
+ *
+ * */
 export type UnitIterator<T extends UnitScope, U extends UnitScope = any> = {
     type: UnitType;
     output: T & U;

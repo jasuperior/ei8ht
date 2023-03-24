@@ -1,7 +1,9 @@
 import {
     AsyncUnitGenerator,
+    AsyncUnitIterator,
     AsyncUnitMethod,
     Primitive,
+    ScopeKey,
     SyncUnitGenerator,
     SyncUnitMethod,
     UnitIterator,
@@ -11,14 +13,18 @@ import {
 import { isAsyncGenerator, isGenerator, isPromise } from "../../utils/helpers";
 import { createFromAsyncGenerator } from "./createFromAsyncGenerator";
 import { createFromAsyncMethod } from "./createFromAsyncMethod";
+import { createFromKey } from "./createFromKey";
 import { createFromSyncGenerator } from "./createFromSyncGenerator";
 import { createFromSyncMethod } from "./createFromSyncMethod";
 
 export const createUnitTree = <T extends UnitScope, U extends UnitScope>(
-    root: UnitMethod<T, U>,
+    root: UnitMethod<T, U> | ScopeKey,
     input: U = {} as U,
     ...branches: UnitIterator<any, T>[]
-): UnitIterator<T, U> => {
+): T extends Promise<any> ? AsyncUnitIterator<T, U> : UnitIterator<T, U> => {
+    if (typeof root !== "function")
+        //@ts-ignore
+        return createFromKey(root, input || {}, ...branches);
     let iterator;
     let value = root(input, branches);
     switch (true) {
@@ -58,5 +64,7 @@ export const createUnitTree = <T extends UnitScope, U extends UnitScope>(
             );
         }
     }
-    return iterator as UnitIterator<T, U>;
+    return iterator as T extends Promise<any>
+        ? AsyncUnitIterator<T, U>
+        : UnitIterator<T, U>;
 };

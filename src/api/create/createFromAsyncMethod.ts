@@ -29,6 +29,9 @@ export const createFromAsyncMethod = <T extends UnitScope, U extends UnitScope>(
     ): UnitFrame<T> => {
         if (Object.is(iterator.future, currentFuture)) {
             //erase future only if the current future is queued
+            //we can probably just use a count to determine this
+            //if the count is at 0, we know all of the futures have been called.
+            //incrememebt on creation, decrement on exit
             iterator.future = undefined;
         }
         if (frame !== undefined) {
