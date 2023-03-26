@@ -20,7 +20,7 @@ export const createFromSyncGenerator = <
     generator: Generator<T | void, T | void, U>,
     fn: SyncUnitGenerator<T, U>,
     input: U,
-    branches: UnitIterator<any, T>[] = []
+    branches: Unit<any, any, T>[] = []
 ): UnitIterator<T, U> => {
     let frame = generator.next();
     let chain = prototype(frame.value || {});
@@ -53,7 +53,7 @@ export const createFromSyncGenerator = <
                     //it replaces the frame in the chain.
                     chain[replaceObj](0, frame.value);
                 }
-                branches.forEach((branch) => branch.next(frame.value as T));
+                branches.forEach((branch) => branch.next(chain as T));
             }
             return frame as UnitFrame<T>;
         },

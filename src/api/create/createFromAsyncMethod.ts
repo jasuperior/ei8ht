@@ -17,7 +17,7 @@ export const createFromAsyncMethod = <T extends UnitScope, U extends UnitScope>(
     promise: PromiseLike<T>,
     fn: AsyncUnitMethod<T, U>,
     input: U,
-    branches: UnitIterator<any, T>[] = []
+    branches: Unit<any, any, T>[] = []
 ): AsyncUnitIterator<T, U> => {
     let iterator: AsyncUnitIterator<T, U>;
     let chain = prototype({});
@@ -39,7 +39,7 @@ export const createFromAsyncMethod = <T extends UnitScope, U extends UnitScope>(
             if (!chain[chainContains](frame)) {
                 chain[replaceObj](0, frame);
             }
-            branches.forEach((branch) => branch.next(frame));
+            branches.forEach((branch) => branch.next(chain));
         }
         return {
             value: frame,

@@ -21,7 +21,7 @@ export const createFromAsyncGenerator = <
     generator: AsyncGenerator<T | void, T | void, U>,
     fn: AsyncUnitGenerator<T, U>,
     input: U,
-    branches: UnitIterator<any, T>[] = []
+    branches: Unit<any, any, T>[] = []
 ): AsyncUnitIterator<T, U> => {
     let framePromise = generator.next();
     let currentFrame = { done: false };
@@ -42,7 +42,7 @@ export const createFromAsyncGenerator = <
             if (!chain[chainContains](frame.value)) {
                 chain[replaceObj](0, frame.value);
             }
-            branches.forEach((branch) => branch.next(frame.value));
+            branches.forEach((branch) => branch.next(chain));
         }
         return frame;
     };

@@ -4,6 +4,7 @@ export const chainLength = Symbol.for("chainLength");
 export const chainContains = Symbol.for("chainContains");
 export const replaceObj = Symbol.for("Replace");
 export const getRange = Symbol.for("GetRange");
+export const getValue = Symbol.for("GetValue");
 const arrayMethods = new Set(["push", "pop", "shift", "unshift"]);
 const isNumber = (prop: any) => !Number.isNaN(parseFloat(prop.toString()));
 export const prototype = <T extends UnitScope>(
@@ -17,9 +18,13 @@ export const prototype = <T extends UnitScope>(
     let replace = (i: number, value: any) => {
         return (chain[i] = value);
     };
+    let value = (i: number) => {
+        return chain[i];
+    };
     let methods = {
         [chainContains]: indexOf,
         [replaceObj]: replace,
+        [getValue]: value,
         get [chainLength]() {
             return chain.length;
         },
@@ -53,6 +58,10 @@ export const prototype = <T extends UnitScope>(
 // const b = { g: 99 };
 // const p = prototype(a);
 // p.push(b);
+// for (let i in p) {
+//     i; //?
+// }
+// Object.keys(p); //?
 // p.push({ name: "lkjlkj" });
 // const pp = p[2];
 // p.a; //?

@@ -1,49 +1,59 @@
 import { createUnitTree } from "../api/create/createUnitTree";
 import { chainLength } from "../api/helpers/DynamicPrototype";
-import { AsyncUnitMethod, UnitScope } from "../model/api.model";
-const Parent: AsyncUnitMethod<
+import {
+    AsyncUnitCategory,
+    AsyncUnitGenerator,
+    AsyncUnitMethod,
+    SyncUnitGenerator,
+    UnitIterator,
     UnitScope,
+} from "../model/api.model";
+import { Html } from "../api/units/Html.tsx";
+const Parent: AsyncUnitMethod<
+    { div: any },
     { prop: string; prop2: string }
 > = async (props, branches) => {
     //this is getting called twice.
 
     return {
-        div(props, branches) {
+        div(props, branches, self) {
             console.log(props);
-            return { age: 323 };
+            return { ageh: 323 };
         },
     };
 };
 
-const Child = async function* (props, branches) {
+const Child = function* (props: { name: string }) {
     console.log(props.name);
-    let result = yield { uuu: props.name + " cole" };
-    console.log(result.prop);
+    let result: typeof props = yield { name: props.name + " cole" };
+    // console.log(result.prop);
     return { name: "finished " + props.name };
 };
 
+// const el = (
+//     <Parent prop="jamel" prop2="age">
+//         <div></div>
+//         {/* <Child name="hello" /> */}
+//     </Parent>
+// );
+
+// const el2 = createUnitTree(Child, { name: "jamel" }, <div></div>);
+
 const el = (
-    <Parent prop="jamel" prop2="age">
-        <div></div>
-        <Child name="hello" />
-    </Parent>
+    <Html container="div">
+        <div
+            onclick={(e) => {
+                console.log("click", e);
+            }}
+        ></div>
+    </Html>
 );
-
-el.next({ prop: "breaking", prop2: "up" });
-// setTimeout(() => {
-//     el; //?
-// }, 1000);
-// el.branches[0].next({ prop: "breaking", morning: "brew" }); //?
-// el.value.inherit.children.keys().next().value.click() //?
-// let el2 = <el.next /> //valid!!
-//how does this interface with html?
-//html context where?
-
-// el.next({ prop: 99 });
-// el.next({ prop: 990 });
-// el.next({ prop: 919 });
-// el.next({ prop: 919 });
-
+// Html.toString() //?
+setImmediate(() => {
+    el.branches[0].output.parent.click();
+});
+// el.branches[0].next(new Event("click")); //?
+// el.branches[0].next(new Event("click")); //?
 /**
  * <element>
  *      <onClick>{(event)=>{ ... }}</onClick>

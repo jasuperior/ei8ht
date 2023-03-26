@@ -15,7 +15,7 @@ export const createFromSyncMethod = <T extends UnitScope, U extends UnitScope>(
     value: T,
     fn: SyncUnitMethod<T, U>,
     input: U,
-    branches: UnitIterator<any, T>[] = []
+    branches: Unit<any, any, T>[] = []
 ): UnitIterator<T, U> => {
     let chain = prototype(value);
     let output = value;

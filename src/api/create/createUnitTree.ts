@@ -1,11 +1,13 @@
 import {
+    AsyncUnitCategory,
     AsyncUnitGenerator,
     AsyncUnitIterator,
     AsyncUnitMethod,
-    Primitive,
     ScopeKey,
+    SyncUnitCategory,
     SyncUnitGenerator,
     SyncUnitMethod,
+    Unit,
     UnitIterator,
     UnitMethod,
     UnitScope,
@@ -17,16 +19,32 @@ import { createFromKey } from "./createFromKey";
 import { createFromSyncGenerator } from "./createFromSyncGenerator";
 import { createFromSyncMethod } from "./createFromSyncMethod";
 
-export const createUnitTree = <T extends UnitScope, U extends UnitScope>(
-    root: UnitMethod<T, U> | ScopeKey,
+export function createUnitTree<T extends UnitScope, U extends UnitScope>(
+    root: AsyncUnitCategory<T, U>,
+    input: U,
+    ...branches: Unit<any, any, T>[]
+): AsyncUnitIterator<T, U>;
+export function createUnitTree<T extends UnitScope, U extends UnitScope>(
+    root: SyncUnitCategory<T, U>,
+    input: U,
+    ...branches: Unit<any, any, T>[]
+): UnitIterator<T, U>;
+export function createUnitTree<T extends UnitScope, U extends UnitScope>(
+    root: ScopeKey,
+    input: U,
+    ...branches: Unit<any, any, T>[]
+): Unit<any, T, U>;
+export function createUnitTree<T extends UnitScope, U extends UnitScope>(
+    this: Unit<typeof root, T, U>,
+    root: any,
     input: U = {} as U,
-    ...branches: UnitIterator<any, T>[]
-): T extends Promise<any> ? AsyncUnitIterator<T, U> : UnitIterator<T, U> => {
+    ...branches: Unit<any, any, T>[]
+): Unit<typeof root, T, U> {
     if (typeof root !== "function")
         //@ts-ignore
         return createFromKey(root, input || {}, ...branches);
     let iterator;
-    let value = root(input, branches);
+    let value = root(input, branches, this);
     switch (true) {
         case isAsyncGenerator(value as AsyncGenerator<T>): {
             iterator = createFromAsyncGenerator(
@@ -62,9 +80,8 @@ export const createUnitTree = <T extends UnitScope, U extends UnitScope>(
                 input,
                 branches
             );
+            break;
         }
     }
-    return iterator as T extends Promise<any>
-        ? AsyncUnitIterator<T, U>
-        : UnitIterator<T, U>;
-};
+    return iterator as any;
+}
