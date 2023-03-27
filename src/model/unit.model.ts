@@ -124,6 +124,7 @@ export type UnitBase<
     type: UnitType;
     kind: UnitKind;
     scope: UnitScope<Parent, Initial, Current>;
+    branches: Unit<UnitScope<Parent, Initial, Current>, any, any>[];
     next: (
         value: Parent
     ) => UnitFrame<Current> | PromiseLike<UnitFrame<Current>>;

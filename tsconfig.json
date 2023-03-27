@@ -7,14 +7,14 @@
         "skipLibCheck": true,
         "forceConsistentCasingInFileNames": true,
         "outDir": "ts-output",
-        "jsxFactory": "createUnitTree",
-        "jsx": "react",
-        "paths": {
-            "@adapters": ["./src/adapters/*"],
-            "@api": ["./src/api/*"],
-            "@models": ["./src/models/*"],
-            "@factories": ["./src/factories/*"]
-        }
+        "jsxFactory": "createUnit",
+        "jsx": "react"
+        // "paths": {
+        //     "@adapters": ["./src/adapters/*"],
+        //     "@api": ["./src/api/*"],
+        //     "@models": ["./src/models/*"],
+        //     "@factories": ["./src/factories/*"]
+        // }
         // "jsxImportSource": "./"
         // "jsxImportSource": "./api/index"
     },

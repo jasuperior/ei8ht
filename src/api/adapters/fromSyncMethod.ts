@@ -19,10 +19,21 @@ export const fromSyncMethod = <
     branches: Unit<UnitScope<Parent, Initial, Current>, any, any>[]
 ): SyncUnit<Parent, Initial, Current> => {
     const scope = polytype(init);
+    const onComplete = (output: Current) => {
+        if (output !== undefined) {
+            scope._define(output);
+            branches.forEach((branch) => branch.next(scope));
+        }
+        return {
+            value: output,
+            done: true,
+        };
+    };
     const unit = {
         type: UnitType.SYNC,
         kind: UnitKind.PURE,
         scope,
+        branches,
         next: (input) => {
             scope._extend(input);
             const output = method(
@@ -30,18 +41,15 @@ export const fromSyncMethod = <
                 branches,
                 unit as SyncUnit<Parent, Initial, Current>
             );
-            if (output !== undefined) {
-                scope._define(output);
-                branches.forEach((branch) => branch.next(scope));
-            }
-            return {
-                value: output,
-                done: true,
-            };
+            return onComplete(output);
         },
     } as Partial<SyncUnit<Parent, Initial, Current>>;
-    scope._define(
-        method(scope, branches, unit as SyncUnit<Parent, Initial, Current>)
+    const output = method(
+        scope,
+        branches,
+        unit as SyncUnit<Parent, Initial, Current>
     );
+    onComplete(output);
+
     return unit as SyncUnit<Parent, Initial, Current>;
 };

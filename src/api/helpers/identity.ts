@@ -19,5 +19,5 @@ export const isPromise = (fn: any): fn is Promise<any> => {
     return fn.constructor.name === "Promise";
 };
 export const isMap = (map: any): map is MapLike<any, any> => {
-    return typeof map.get === "function" && typeof map.set === "function";
+    return typeof map?.get === "function" && typeof map?.set === "function";
 };

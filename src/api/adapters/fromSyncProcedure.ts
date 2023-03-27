@@ -19,10 +19,19 @@ export const fromSyncProcedure = <
     branches: Unit<UnitScope<Parent, Initial, Current>, any, any>[]
 ): SyncUnit<Parent, Initial, Current> => {
     const scope = polytype(init);
+    const onComplete = (output: IteratorResult<Current, Current>) => {
+        if (output.value !== undefined) {
+            scope._define(output.value);
+            branches.forEach((branch) => branch.next(scope));
+        }
+        lastFrame = output;
+        return lastFrame;
+    };
     const unit = {
         type: UnitType.SYNC,
         kind: UnitKind.PROCEDURAL,
         scope,
+        branches,
         next: (input) => {
             scope._extend(input);
             if (lastFrame.done) {
@@ -33,10 +42,7 @@ export const fromSyncProcedure = <
                 );
             }
             const output = generator.next(scope);
-            if (output.value !== undefined) {
-                scope._define(output.value);
-                branches.forEach((branch) => branch.next(scope));
-            }
+            onComplete(output);
             return output;
         },
     } as Partial<SyncUnit<Parent, Initial, Current>>;
@@ -45,9 +51,7 @@ export const fromSyncProcedure = <
         branches,
         unit as SyncUnit<Parent, Initial, Current>
     );
-    let lastFrame = {
-        value: undefined,
-        done: false,
-    };
+    let lastFrame = generator.next(scope);
+    onComplete(lastFrame);
     return unit as SyncUnit<Parent, Initial, Current>;
 };

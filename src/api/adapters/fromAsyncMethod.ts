@@ -35,6 +35,7 @@ export const fromAsyncMethod = <
         type: UnitType.ASYNC,
         kind: UnitKind.PURE,
         scope,
+        branches,
         get state() {
             return duration === 0 ? UnitState.PENDING : UnitState.RESOLVED;
         },

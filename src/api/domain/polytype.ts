@@ -1,5 +1,7 @@
 import { Scope } from "../../model/domain.model";
+import { isMap } from "../helpers/identity";
 
+const mapMethods = new Set(["get", "set", "has", "delete", "clear", "forEach"]);
 export class Polytype<
     Current extends Scope,
     Prev extends any = any,
@@ -14,8 +16,10 @@ export class Polytype<
             get(target, prop) {
                 let value = Polytype.getValue(target, prop);
                 if (value) return value;
-                for (let obj of target.chain) {
+                for (let i = 2; i > -1; i--) {
+                    let obj = target.chain[i];
                     value = Polytype.getValue(obj, prop);
+                    // console.log(prop, value);
                     if (value) return value;
                 }
             },
@@ -44,11 +48,22 @@ export class Polytype<
             yield obj;
         }
     }
-
     static getValue(target: any, prop: any) {
-        let value = Reflect.get(target, prop);
+        let value;
+        if (
+            !Polytype.isPolytype(target) &&
+            !mapMethods.has(prop) &&
+            isMap(target)
+        ) {
+            value = target.get(prop);
+        } else {
+            value = Reflect.get(target || {}, prop);
+        }
         if (typeof value === "function") return value.bind(target);
         return value;
+    }
+    static isPolytype(obj: any) {
+        return obj instanceof Polytype;
     }
 }
 export const polytype = <

@@ -35,6 +35,7 @@ export const fromAsyncProcedure = <
         type: UnitType.ASYNC,
         kind: UnitKind.PROCEDURAL,
         scope,
+        branches,
         next: (input) => {
             scope._extend(input);
             if (lastFrame.done) {
@@ -63,5 +64,6 @@ export const fromAsyncProcedure = <
         value: undefined,
         done: false,
     } as unknown as UnitFrame<Current>;
+    unit.future = generator.next(scope).then(onComplete);
     return unit as AsyncUnit<Parent, Initial, Current>;
 };
