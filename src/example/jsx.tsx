@@ -8,7 +8,7 @@ import {
     UnitIterator,
     UnitScope,
 } from "../model/api.model";
-import { Html } from "../api/units/Html.tsx";
+import { Html } from "../api/units/Html";
 const Parent: AsyncUnitMethod<
     { div: any },
     { prop: string; prop2: string }
