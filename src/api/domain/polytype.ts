@@ -1,13 +1,15 @@
+import { Scope } from "../../model/domain.model";
+
 export class Polytype<
-    Current extends Record<any, any>,
-    Prev extends Record<any, any> = any,
-    Next extends Record<any, any> = any
+    Current extends Scope,
+    Prev extends any = any,
+    Next extends Scope = any
 > {
     chain: [Prev, Current, Next] = new Array(3) as [Prev, Current, Next];
     constructor(identity: Current, before?: Prev, after?: Next) {
+        this.chain[0] = (before || null) as Prev;
         this.chain[1] = identity;
-        if (before) this.chain[0] = before;
-        if (after) this.chain[2] = after;
+        this.chain[2] = (after || null) as Next;
         return new Proxy(this, {
             get(target, prop) {
                 let value = Polytype.getValue(target, prop);
@@ -19,13 +21,19 @@ export class Polytype<
             },
         });
     }
-    extend(obj: Prev) {
+    _set(obj: Current) {
+        //comes before obj in chain
+        if (obj) {
+            this.chain[1] = obj;
+        }
+    }
+    _extend(obj: Prev) {
         //comes after obj in chain
         if (obj) {
             this.chain[0] = obj;
         }
     }
-    define(obj: Next) {
+    _define(obj: Next) {
         //comes  before obj in chain
         if (obj) {
             this.chain[2] = obj;

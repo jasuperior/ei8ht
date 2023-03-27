@@ -9,6 +9,11 @@ import {
     UnitScope,
 } from "../model/api.model";
 import { Html } from "../api/units/Html";
+import {
+    isAsync,
+    isAsyncGenerator,
+    isGenerator,
+} from "../api/helpers/identity";
 const Parent: AsyncUnitMethod<
     { div: any },
     { prop: string; prop2: string }
@@ -23,7 +28,7 @@ const Parent: AsyncUnitMethod<
     };
 };
 
-const Child = function* (props: { name: string }) {
+const Child = async function* (props: { name: string }) {
     console.log(props.name);
     let result: typeof props = yield { name: props.name + " cole" };
     // console.log(result.prop);
@@ -39,19 +44,19 @@ const Child = function* (props: { name: string }) {
 
 // const el2 = createUnitTree(Child, { name: "jamel" }, <div></div>);
 
-const el = (
-    <Html container="div">
-        <div
-            onclick={(e) => {
-                console.log("click", e);
-            }}
-        ></div>
-    </Html>
-);
+// const el = (
+//     <Html container="div">
+//         <div
+//             onclick={(e) => {
+//                 console.log("click", e);
+//             }}
+//         ></div>
+//     </Html>
+// );
 // Html.toString() //?
-setImmediate(() => {
-    el.branches[0].output.parent.click();
-});
+// setImmediate(() => {
+//     el.branches[0].output.parent.click();
+// });
 // el.branches[0].next(new Event("click")); //?
 // el.branches[0].next(new Event("click")); //?
 /**
