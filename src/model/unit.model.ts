@@ -31,9 +31,9 @@ export type UnitScope<
 
 // ---------------- Unit Methods  ---------------- //
 export type AsyncUnitMethod<
-    Parent extends UnitScope,
-    Initial extends Scope,
-    Current extends Scope
+    Parent extends UnitScope = any,
+    Initial extends Scope = any,
+    Current extends Scope = any
 > = (
     input: UnitScope<Parent, Initial, Current>,
     branches: Unit<UnitScope<Parent, Initial, Current>, any, any>[],
@@ -41,9 +41,9 @@ export type AsyncUnitMethod<
 ) => PromiseLike<Current>;
 
 export type SyncUnitMethod<
-    Parent extends UnitScope,
-    Initial extends Scope,
-    Current extends Scope
+    Parent extends UnitScope = any,
+    Initial extends Scope = any,
+    Current extends Scope = any
 > = (
     input: UnitScope<Parent, Initial, Current>,
     branches: Unit<UnitScope<Parent, Initial, Current>, any, any>[],
@@ -56,18 +56,18 @@ export type SyncUnitMethod<
  * It can be either an async or sync method.
  */
 export type UnitMethod<
-    Parent extends UnitScope,
-    Initial extends Scope,
-    Current extends Scope
+    Parent extends UnitScope = any,
+    Initial extends Scope = any,
+    Current extends Scope = any
 > =
     | AsyncUnitMethod<Parent, Initial, Current>
     | SyncUnitMethod<Parent, Initial, Current>;
 
 // ---------------- Unit Procedures  ---------------- //
 export type AsyncUnitProcedure<
-    Parent extends UnitScope,
-    Initial extends Scope,
-    Current extends Scope
+    Parent extends UnitScope = any,
+    Initial extends Scope = any,
+    Current extends Scope = any
 > = (
     input: UnitScope<Parent, Initial, Current>,
     branches: Unit<UnitScope<Parent, Initial, Current>, any, any>[],
@@ -75,9 +75,9 @@ export type AsyncUnitProcedure<
 ) => AsyncGenerator<Current, Current, Parent>;
 
 export type SyncUnitProcedure<
-    Parent extends UnitScope,
-    Initial extends Scope,
-    Current extends Scope
+    Parent extends UnitScope = any,
+    Initial extends Scope = any,
+    Current extends Scope = any
 > = (
     input: UnitScope<Parent, Initial, Current>,
     branches: Unit<UnitScope<Parent, Initial, Current>, any, any>[],
@@ -90,9 +90,9 @@ export type SyncUnitProcedure<
  * of a unit. It can be either an async or sync procedure.
  */
 export type UnitProcedure<
-    Parent extends UnitScope,
-    Initial extends Scope,
-    Current extends Scope
+    Parent extends UnitScope = any,
+    Initial extends Scope = any,
+    Current extends Scope = any
 > =
     | AsyncUnitProcedure<Parent, Initial, Current>
     | SyncUnitProcedure<Parent, Initial, Current>;
