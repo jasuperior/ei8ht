@@ -25,7 +25,7 @@ export const fromAsyncMethod = <
         duration--;
         if (output !== undefined) {
             scope._define(output);
-            branches.forEach((branch) => branch.next(scope));
+            branches.forEach((branch) => branch?.next?.(scope));
         }
         if (duration === 0) unit.future = undefined;
         return toCompleteFrame(output);
@@ -37,7 +37,7 @@ export const fromAsyncMethod = <
         scope,
         branches,
         get state() {
-            return duration === 0 ? UnitState.PENDING : UnitState.RESOLVED;
+            return duration === 0 ? UnitState.RESOLVED : UnitState.PENDING;
         },
         next: (input) => {
             duration++;

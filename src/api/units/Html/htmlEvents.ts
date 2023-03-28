@@ -77,4 +77,4 @@ export const htmlEvents = [
     "load",
     "error",
     "abort",
-];
+] as const;

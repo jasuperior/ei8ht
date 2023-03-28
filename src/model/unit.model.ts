@@ -103,9 +103,9 @@ export type UnitProcedure<
  * It can be either an async or sync method or procedure.
  */
 export type UnitScheme<
-    Parent extends UnitScope,
-    Initial extends Scope,
-    Current extends Scope
+    Parent extends UnitScope = any,
+    Initial extends Scope = any,
+    Current extends Scope = any
 > =
     | UnitMethod<Parent, Initial, Current>
     | UnitProcedure<Parent, Initial, Current>;

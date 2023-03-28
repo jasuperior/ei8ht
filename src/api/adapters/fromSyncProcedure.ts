@@ -22,7 +22,7 @@ export const fromSyncProcedure = <
     const onComplete = (output: IteratorResult<Current, Current>) => {
         if (output.value !== undefined) {
             scope._define(output.value);
-            branches.forEach((branch) => branch.next(scope));
+            branches.forEach((branch) => branch?.next?.(scope));
         }
         lastFrame = output;
         return lastFrame;

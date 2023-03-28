@@ -55,7 +55,8 @@ export class Polytype<
             !mapMethods.has(prop) &&
             isMap(target)
         ) {
-            value = target.get(prop);
+            //do this the other way around
+            value = Reflect.get(target, prop) || target.get(prop);
         } else {
             value = Reflect.get(target || {}, prop);
         }

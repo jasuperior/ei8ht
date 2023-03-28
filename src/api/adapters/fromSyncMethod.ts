@@ -22,7 +22,7 @@ export const fromSyncMethod = <
     const onComplete = (output: Current) => {
         if (output !== undefined) {
             scope._define(output);
-            branches.forEach((branch) => branch.next(scope));
+            branches.forEach((branch) => branch?.next?.(scope));
         }
         return {
             value: output,

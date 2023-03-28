@@ -7,6 +7,7 @@ import {
     UnitKind,
     UnitType,
     UnitFrame,
+    UnitState,
 } from "../../model/unit.model";
 import { polytype } from "../domain/polytype";
 
@@ -24,7 +25,7 @@ export const fromAsyncProcedure = <
         duration--;
         if (output.value !== undefined) {
             scope._define(output.value);
-            branches.forEach((branch) => branch.next(scope));
+            branches.forEach((branch) => branch?.next?.(scope));
         }
         if (duration === 0) unit.future = undefined;
         lastFrame = output as UnitFrame<Current>;
@@ -36,6 +37,9 @@ export const fromAsyncProcedure = <
         kind: UnitKind.PROCEDURAL,
         scope,
         branches,
+        get state() {
+            return duration === 0 ? UnitState.RESOLVED : UnitState.PENDING;
+        },
         next: (input) => {
             scope._extend(input);
             if (lastFrame.done) {
