@@ -1,9 +1,14 @@
 import { createUnit } from "../api/factories/createUnit";
 import { Html } from "../api/units/Html/Html";
-import { AsyncUnit, SyncUnitProcedure } from "../model/unit.model";
+import { Scope } from "../model/domain.model";
+import {
+    AsyncUnit,
+    AsyncUnitClass,
+    SyncUnitProcedure,
+} from "../model/unit.model";
 
 let count = 0;
-const unit: AsyncUnit = (
+const unit: AsyncUnit<Scope, { container: JSX.UnitElement }> = (
     <Html use="main">
         <div
             id="parent"
@@ -34,14 +39,7 @@ const unit: AsyncUnit = (
     </Html>
 );
 
-setImmediate(() => {
-    unit.scope.container.outerHTML; //?
-    unit.branches[0].branches[0].scope.trigger("click", {
-        target: unit.branches[0].scope.container,
-    });
-    // unit.branches[0].branches[0].scope.trigger("click");
-    // unit.scope.container.outerHTML; //?
-    // unit.branches[0].branches[0].scope.chain; //?
-    unit.future; //?
-    unit.state; //?
+unit.scope.container.outerHTML; //?
+unit.branches[0].branches[0].scope.trigger("click", {
+    target: unit.branches[0].scope.container,
 });

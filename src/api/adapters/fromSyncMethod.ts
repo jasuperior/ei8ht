@@ -1,9 +1,9 @@
 import { Scope } from "../../model/domain.model";
 import {
-    SyncUnit,
+    SyncUnitClass,
     UnitScope,
     SyncUnitMethod,
-    Unit,
+    UnitClass,
     UnitType,
     UnitKind,
 } from "../../model/unit.model";
@@ -16,8 +16,8 @@ export const fromSyncMethod = <
 >(
     method: SyncUnitMethod<Parent, Initial, Current>,
     init: Initial,
-    branches: Unit<UnitScope<Parent, Initial, Current>, any, any>[]
-): SyncUnit<Parent, Initial, Current> => {
+    branches: UnitClass<UnitScope<Parent, Initial, Current>, any, any>[]
+): SyncUnitClass<Parent, Initial, Current> => {
     const scope = polytype(init);
     const onComplete = (output: Current) => {
         if (output !== undefined) {
@@ -39,17 +39,17 @@ export const fromSyncMethod = <
             const output = method(
                 scope,
                 branches,
-                unit as SyncUnit<Parent, Initial, Current>
+                unit as SyncUnitClass<Parent, Initial, Current>
             );
             return onComplete(output);
         },
-    } as Partial<SyncUnit<Parent, Initial, Current>>;
+    } as Partial<SyncUnitClass<Parent, Initial, Current>>;
     const output = method(
         scope,
         branches,
-        unit as SyncUnit<Parent, Initial, Current>
+        unit as SyncUnitClass<Parent, Initial, Current>
     );
     onComplete(output);
 
-    return unit as SyncUnit<Parent, Initial, Current>;
+    return unit as SyncUnitClass<Parent, Initial, Current>;
 };

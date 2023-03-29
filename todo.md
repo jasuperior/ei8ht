@@ -10,6 +10,8 @@
 -   [ ] rework unit model to implicitly make the Parent into a unit scope
 -   [x] implement fromKey as a promise or iterator of the eventual value?
 -   [ ] simpler Unit generics
+    -   [x] Unit Iterator
+    -   [ ] Unit Schemes
 -   [ ] figure out scope accessor (method?)
 -   [ ] create tests
 -   [ ]

@@ -1,10 +1,10 @@
 import { Scope } from "../../model/domain.model";
 import {
     SyncUnitProcedure,
-    SyncUnit,
+    SyncUnitClass,
     UnitKind,
     UnitScope,
-    Unit,
+    UnitClass,
     UnitType,
 } from "../../model/unit.model";
 import { polytype } from "../domain/polytype";
@@ -16,8 +16,8 @@ export const fromSyncProcedure = <
 >(
     procedure: SyncUnitProcedure<Parent, Initial, Current>,
     init: Initial,
-    branches: Unit<UnitScope<Parent, Initial, Current>, any, any>[]
-): SyncUnit<Parent, Initial, Current> => {
+    branches: UnitClass<UnitScope<Parent, Initial, Current>, any, any>[]
+): SyncUnitClass<Parent, Initial, Current> => {
     const scope = polytype(init);
     const onComplete = (output: IteratorResult<Current, Current>) => {
         if (output.value !== undefined) {
@@ -38,20 +38,20 @@ export const fromSyncProcedure = <
                 generator = procedure(
                     scope,
                     branches,
-                    unit as SyncUnit<Parent, Initial, Current>
+                    unit as SyncUnitClass<Parent, Initial, Current>
                 );
             }
             const output = generator.next(scope);
             onComplete(output);
             return output;
         },
-    } as Partial<SyncUnit<Parent, Initial, Current>>;
+    } as Partial<SyncUnitClass<Parent, Initial, Current>>;
     let generator = procedure(
         scope,
         branches,
-        unit as SyncUnit<Parent, Initial, Current>
+        unit as SyncUnitClass<Parent, Initial, Current>
     );
     let lastFrame = generator.next(scope);
     onComplete(lastFrame);
-    return unit as SyncUnit<Parent, Initial, Current>;
+    return unit as SyncUnitClass<Parent, Initial, Current>;
 };

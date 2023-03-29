@@ -1,7 +1,7 @@
 import { Primitive, Scope } from "../../model/domain.model";
 import {
     UnitScope,
-    Unit,
+    UnitClass,
     UnitType,
     UnitKind,
     UnitScheme,
@@ -16,9 +16,9 @@ export const fromKey = <
 >(
     key: Primitive,
     init: Initial,
-    branches: Unit<UnitScope<Parent, Initial, Current>, any, any>[]
-): Unit<UnitScope<Parent, Initial, Current>, Initial, Current> => {
-    let unit: Unit;
+    branches: UnitClass<UnitScope<Parent, Initial, Current>, any, any>[]
+): UnitClass<UnitScope<Parent, Initial, Current>, Initial, Current> => {
+    let unit: UnitClass;
     let scheme = () => {};
     const getScheme = (props: any) => {
         if (typeof props[key as keyof typeof props] === "function") {
@@ -55,9 +55,9 @@ export const fromKeyAsync = <
 >(
     key: Primitive,
     init: Initial,
-    branches: Unit<UnitScope<Parent, Initial, Current>, any, any>[]
-): Unit<UnitScope<Parent, Initial, Current>, Initial, Current> => {
-    let unit: Unit;
+    branches: UnitClass<UnitScope<Parent, Initial, Current>, any, any>[]
+): UnitClass<UnitScope<Parent, Initial, Current>, Initial, Current> => {
+    let unit: UnitClass;
     let scheme = () => {};
     const getScheme = (props: any) => {
         if (typeof props[key as keyof typeof props] === "function") {

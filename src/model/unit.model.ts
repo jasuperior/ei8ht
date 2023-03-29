@@ -2,19 +2,40 @@ import { hasInstance } from "../api/domain/constants";
 import { Polytype } from "../api/domain/polytype";
 import { Scope } from "./domain.model";
 
+/**
+ * @description
+ * the type of a unit. This is used to determine if the unit is sync or async.
+ */
 export enum UnitType {
     SYNC = "sync",
     ASYNC = "async",
 }
+/**
+ * @description
+ * the state of an async unit. This is used to determine if the unit is
+ * pending, resolved, or rejected.
+ */
 export enum UnitState {
     PENDING = "pending",
     RESOLVED = "resolved",
     REJECTED = "rejected",
 }
+
+/**
+ * @description
+ * the kind of a unit. This is used to determine if the unit is procedural or
+ * pure function.
+ */
 export enum UnitKind {
     PURE = "pure",
     PROCEDURAL = "procedural",
 }
+
+/**
+ * @description
+ * the output of a unit after its next method is called.
+ * @template T the type of the unit's scope.
+ */
 export type UnitFrame<T> = {
     value: T;
     done: boolean;
@@ -37,8 +58,8 @@ export type AsyncUnitMethod<
     Current extends Scope = any
 > = (
     input: UnitScope<Parent, Initial, Current>,
-    branches: Unit<UnitScope<Parent, Initial, Current>, any, any>[],
-    self: AsyncUnit<Parent, Initial, Current>
+    branches: UnitClass<UnitScope<Parent, Initial, Current>, any, any>[],
+    self: AsyncUnitClass<Parent, Initial, Current>
 ) => PromiseLike<Current>;
 
 export type SyncUnitMethod<
@@ -47,8 +68,8 @@ export type SyncUnitMethod<
     Current extends Scope = any
 > = (
     input: UnitScope<Parent, Initial, Current>,
-    branches: Unit<UnitScope<Parent, Initial, Current>, any, any>[],
-    self: SyncUnit<Parent, Initial, Current>
+    branches: UnitClass<UnitScope<Parent, Initial, Current>, any, any>[],
+    self: SyncUnitClass<Parent, Initial, Current>
 ) => Current;
 
 /**
@@ -71,8 +92,8 @@ export type AsyncUnitProcedure<
     Current extends Scope = any
 > = (
     input: UnitScope<Parent, Initial, Current>,
-    branches: Unit<UnitScope<Parent, Initial, Current>, any, any>[],
-    self: AsyncUnit<Parent, Initial, Current>
+    branches: UnitClass<UnitScope<Parent, Initial, Current>, any, any>[],
+    self: AsyncUnitClass<Parent, Initial, Current>
 ) => AsyncGenerator<Current, Current, Parent>;
 
 export type SyncUnitProcedure<
@@ -81,8 +102,8 @@ export type SyncUnitProcedure<
     Current extends Scope = any
 > = (
     input: UnitScope<Parent, Initial, Current>,
-    branches: Unit<UnitScope<Parent, Initial, Current>, any, any>[],
-    self: SyncUnit<Parent, Initial, Current>
+    branches: UnitClass<UnitScope<Parent, Initial, Current>, any, any>[],
+    self: SyncUnitClass<Parent, Initial, Current>
 ) => Generator<Current, Current, Parent>;
 
 /**
@@ -125,7 +146,7 @@ export type UnitBase<
     type: UnitType;
     kind: UnitKind;
     scope: UnitScope<Parent, Initial, Current>;
-    branches: Unit<UnitScope<Parent, Initial, Current>, any, any>[];
+    branches: UnitClass<UnitScope<Parent, Initial, Current>, any, any>[];
     next: (
         value: Parent
     ) => UnitFrame<Current> | PromiseLike<UnitFrame<Current>>;
@@ -137,7 +158,7 @@ export type UnitBase<
  * An async unit is a unit that returns a promise. It is used to define the
  * properties of an async unit.
  */
-export interface AsyncUnit<
+export interface AsyncUnitClass<
     Parent extends UnitScope = any,
     Initial extends Scope = any,
     Current extends Scope = any
@@ -147,12 +168,13 @@ export interface AsyncUnit<
     state: UnitState;
     next: (value: Parent) => PromiseLike<UnitFrame<Current>>;
 }
+
 /**
  * @description
  * A sync unit is a unit that returns a value. It is used to define the
  * properties of a sync unit.
  */
-export interface SyncUnit<
+export interface SyncUnitClass<
     Parent extends UnitScope = any,
     Initial extends Scope = any,
     Current extends Scope = any
@@ -160,13 +182,34 @@ export interface SyncUnit<
     type: UnitType.SYNC;
     next: (value: Parent) => UnitFrame<Current>;
 }
+
 /**
  * @description
- * A unit is a unit that returns a value or a promise. It is used to define the
+ * A unit class is a unit that returns a value or a promise. It is used to define the
  * properties of a unit.
  */
-export type Unit<
+export type UnitClass<
     Parent extends UnitScope = any,
     Initial extends Scope = any,
     Current extends Scope = any
-> = AsyncUnit<Parent, Initial, Current> | SyncUnit<Parent, Initial, Current>;
+> =
+    | AsyncUnitClass<Parent, Initial, Current>
+    | SyncUnitClass<Parent, Initial, Current>;
+
+export type SyncUnit<
+    Parent extends Scope = Scope,
+    Initial extends Scope = Scope,
+    Current extends Scope = Scope
+> = SyncUnitClass<UnitScope<Scope, Scope, Parent>, Initial, Current>;
+
+export type AsyncUnit<
+    Parent extends Scope = Scope,
+    Initial extends Scope = Scope,
+    Current extends Scope = Scope
+> = AsyncUnitClass<UnitScope<Scope, Scope, Parent>, Initial, Current>;
+
+export type Unit<
+    Parent extends Scope = Scope,
+    Initial extends Scope = Scope,
+    Current extends Scope = Scope
+> = SyncUnit<Parent, Initial, Current> | AsyncUnit<Parent, Initial, Current>;

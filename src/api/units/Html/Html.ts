@@ -1,8 +1,8 @@
 import { MapLike } from "../../../model/domain.model";
 import {
-    AsyncUnit,
+    AsyncUnitClass,
     AsyncUnitMethod,
-    Unit,
+    UnitClass,
     UnitScheme,
     UnitScope,
 } from "../../../model/unit.model";
@@ -17,10 +17,10 @@ type HtmlOutput = MapLike<HtmlTags, UnitScheme> & {
     container: HTMLElement;
 };
 
-export const Html = async (
+export const Html = (
     props: HtmlProps,
     branches: any[],
-    self: AsyncUnit<HtmlProps, HtmlProps, any>
+    self: AsyncUnitClass<HtmlProps, HtmlProps, any>
 ) => {
     const root = document.createElement(props.use);
     root.id = "root";
@@ -42,7 +42,7 @@ export const Html = async (
                 return function* (
                     props: UnitScope,
                     branches: any[],
-                    self: Unit
+                    self: UnitClass
                 ) {
                     const child = document.createElement(key);
                     child.id = props.id;

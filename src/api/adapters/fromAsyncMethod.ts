@@ -1,8 +1,8 @@
 import {
     UnitScope,
     AsyncUnitMethod,
-    Unit,
-    AsyncUnit,
+    UnitClass,
+    AsyncUnitClass,
     UnitKind,
     UnitType,
     UnitState,
@@ -18,8 +18,8 @@ export const fromAsyncMethod = <
 >(
     method: AsyncUnitMethod<Parent, Initial, Current>,
     init: Initial,
-    branches: Unit<UnitScope<Parent, Initial, Current>, any, any>[]
-): AsyncUnit<Parent, Initial, Current> => {
+    branches: UnitClass<UnitScope<Parent, Initial, Current>, any, any>[]
+): AsyncUnitClass<Parent, Initial, Current> => {
     const scope = polytype(init);
     const onComplete = (output: Current) => {
         duration--;
@@ -48,7 +48,7 @@ export const fromAsyncMethod = <
                         method(
                             scope,
                             branches,
-                            unit as AsyncUnit<Parent, Initial, Current>
+                            unit as AsyncUnitClass<Parent, Initial, Current>
                         )
                     )
                     .then(onComplete);
@@ -56,17 +56,17 @@ export const fromAsyncMethod = <
                 unit.future = method(
                     scope,
                     branches,
-                    unit as AsyncUnit<Parent, Initial, Current>
+                    unit as AsyncUnitClass<Parent, Initial, Current>
                 ).then(onComplete);
             }
             return unit.future;
         },
-    } as Partial<AsyncUnit<Parent, Initial, Current>>;
+    } as Partial<AsyncUnitClass<Parent, Initial, Current>>;
     duration++;
     unit.future = method(
         scope,
         branches,
-        unit as AsyncUnit<Parent, Initial, Current>
+        unit as AsyncUnitClass<Parent, Initial, Current>
     ).then(onComplete);
-    return unit as AsyncUnit<Parent, Initial, Current>;
+    return unit as AsyncUnitClass<Parent, Initial, Current>;
 };

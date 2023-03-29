@@ -1,7 +1,7 @@
 import {
     UnitScope,
     UnitMethod,
-    Unit,
+    UnitClass,
     SyncUnitMethod,
 } from "../../model/unit.model";
 import {
@@ -22,8 +22,8 @@ export const createUnit = <
 >(
     method: UnitMethod<Parent, Initial, Current> | Primitive,
     init: Initial,
-    ...branches: Unit<UnitScope<Parent, Initial, Current>, any, any>[]
-): Unit<UnitScope<Parent, Initial, Current>, Initial, Current> => {
+    ...branches: UnitClass<UnitScope<Parent, Initial, Current>, any, any>[]
+): UnitClass<UnitScope<Parent, Initial, Current>, Initial, Current> => {
     if (typeof method !== "function") {
         if ((init as any)?.await) {
             return fromKeyAsync(method, init, branches);
@@ -40,6 +40,6 @@ export const createUnit = <
             method as SyncUnitMethod<Parent, Initial, Current>,
             init,
             branches
-        ) as Unit<UnitScope<Parent, Initial, Current>, Initial, Current>;
+        ) as UnitClass<UnitScope<Parent, Initial, Current>, Initial, Current>;
     }
 };
