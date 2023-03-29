@@ -1,13 +1,15 @@
 -   [x] finish implementing `fromKey`
 -   [ ] abstract unit types into classes (memory efficiency)
 -   [x] allow units to accept primitive children
--   [ ] look at the timing of asyncUnit.next resolution (catch in particular)
 -   [ ] should asyncUnits be cancellable
 -   [ ] async unit rejection strategy
 -   [ ] implement Iterator interface on units
--   [ ] define JSX Intrinsics
+-   [x] define JSX Intrinsics
 -   [ ] handle errors
--   [ ] create HTML helper unit
+-   [x] create HTML helper unit
 -   [ ] rework unit model to implicitly make the Parent into a unit scope
-
--   [ ] implement fromKey as a promise or iterator of the eventual value?
+-   [x] implement fromKey as a promise or iterator of the eventual value?
+-   [ ] simpler Unit generics
+-   [ ] figure out scope accessor (method?)
+-   [ ] create tests
+-   [ ]

@@ -10,6 +10,7 @@ import {
     fromAsyncMethod,
     fromSyncMethod,
     fromKey,
+    fromKeyAsync,
 } from "../adapters/index";
 import { Primitive, Scope } from "../../model/domain.model";
 import { isAsync, isAsyncGenerator, isGenerator } from "../helpers/identity";
@@ -24,6 +25,9 @@ export const createUnit = <
     ...branches: Unit<UnitScope<Parent, Initial, Current>, any, any>[]
 ): Unit<UnitScope<Parent, Initial, Current>, Initial, Current> => {
     if (typeof method !== "function") {
+        if ((init as any)?.await) {
+            return fromKeyAsync(method, init, branches);
+        }
         return fromKey(method, init, branches);
     } else if (isAsyncGenerator(method)) {
         return fromAsyncProcedure(method, init, branches);

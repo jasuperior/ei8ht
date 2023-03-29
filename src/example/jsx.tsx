@@ -2,43 +2,9 @@ import { createUnit } from "../api/factories/createUnit";
 import { Html } from "../api/units/Html/Html";
 import { AsyncUnit, SyncUnitProcedure } from "../model/unit.model";
 
-const Example = async (
-    initial: { age: string },
-    branches: string[],
-    self: any
-) => {
-    // console.log("Example", initial, branches, self);
-    await new Promise((resolve) => setTimeout(resolve, 0));
-    return new Map([
-        [
-            "name",
-            () => {
-                console.log("Example Branch");
-            },
-        ],
-        [
-            "div",
-            () => {
-                console.log("Example Branch");
-            },
-        ],
-    ]);
-};
-const ExampleGen: SyncUnitProcedure = function* (
-    initial: any,
-    branches: any,
-    self: any
-) {
-    // console.log("ExampleGen", initial, branches, self);
-
-    let result = yield { name: "Example Yielded" };
-    // console.log(branches[1]);
-    return {
-        name2: result.something,
-    };
-};
+let count = 0;
 const unit: AsyncUnit = (
-    <Html root="main">
+    <Html use="main">
         <div
             id="parent"
             onClick={() => {
@@ -50,8 +16,9 @@ const unit: AsyncUnit = (
         >
             <div
                 id="test"
-                onClick={() => {
-                    console.log("click");
+                onClick={(e) => {
+                    count++;
+                    e.target.innerHTML = `count ${count}`; //?
                 }}
                 onBlur={() => {
                     console.log("blur");
@@ -59,6 +26,7 @@ const unit: AsyncUnit = (
             />
         </div>
         <input
+            id="input"
             onFocus={() => {
                 console.log("focus");
             }}
@@ -67,15 +35,13 @@ const unit: AsyncUnit = (
 );
 
 setImmediate(() => {
-    // unit.branches[0].scope.container.dispatchEvent(new Event("click"));
-    // unit.branches[0].scope.container.dispatchEvent(
-    //     new CustomEvent("blur", { bubbles: true, cancelable: false })
-    // );
-    // unit.branches[0].scope.container.dispatchEvent(
-    //         new CustomEvent("blur", { bubbles: true, cancelable: false })
-    //     ); //?
-    unit.branches[0].branches[0].scope.trigger("click");
-    unit.branches[0].branches[0].scope.chain; //?
+    unit.scope.container.outerHTML; //?
+    unit.branches[0].branches[0].scope.trigger("click", {
+        target: unit.branches[0].scope.container,
+    });
+    // unit.branches[0].branches[0].scope.trigger("click");
+    // unit.scope.container.outerHTML; //?
+    // unit.branches[0].branches[0].scope.chain; //?
     unit.future; //?
     unit.state; //?
 });

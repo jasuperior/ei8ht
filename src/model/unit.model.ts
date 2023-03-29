@@ -1,3 +1,4 @@
+import { hasInstance } from "../api/domain/constants";
 import { Polytype } from "../api/domain/polytype";
 import { Scope } from "./domain.model";
 
@@ -128,6 +129,7 @@ export type UnitBase<
     next: (
         value: Parent
     ) => UnitFrame<Current> | PromiseLike<UnitFrame<Current>>;
+    [hasInstance]: Set<UnitScheme>;
 };
 
 /**

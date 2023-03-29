@@ -1,7 +1,7 @@
 export type Primitive = string | boolean | number;
 export type Key = string | symbol | number;
 export type MapLike<T, U> = {
-    get(key: T): U;
+    get(key: T): U | void;
     set(key: T, value: U): void;
 };
 export type AsyncFunction<T extends any[] = any[], U = any> = (
