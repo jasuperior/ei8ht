@@ -18,7 +18,7 @@ export class Polytype<
                 if (value) return value;
                 for (let i = 2; i > -1; i--) {
                     let obj = target.chain[i];
-                    value = Polytype.getValue(obj, prop);
+                    value = Polytype.getValue(obj, prop, i);
                     // console.log(prop, value);
                     if (value) return value;
                 }
@@ -48,9 +48,11 @@ export class Polytype<
             yield obj;
         }
     }
-    static getValue(target: any, prop: any) {
+    static getValue(target: any, prop: any, idx: number = -1) {
         let value;
-        if (
+        if (idx == 0 && target?.ignore && target.ignore.has(prop)) {
+            return undefined;
+        } else if (
             !Polytype.isPolytype(target) &&
             !mapMethods.has(prop) &&
             isMap(target)
@@ -60,7 +62,8 @@ export class Polytype<
         } else {
             value = Reflect.get(target || {}, prop);
         }
-        if (typeof value === "function") return value.bind(target);
+        //do I have to do this?
+        // if (typeof value === "function") return value.bind(target);
         return value;
     }
     static isPolytype(obj: any) {

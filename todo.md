@@ -7,11 +7,11 @@
 -   [x] define JSX Intrinsics
 -   [ ] handle errors
 -   [x] create HTML helper unit
--   [ ] rework unit model to implicitly make the Parent into a unit scope
+-   [x] rework unit model to implicitly make the Parent into a unit scope
 -   [x] implement fromKey as a promise or iterator of the eventual value?
 -   [ ] simpler Unit generics
     -   [x] Unit Iterator
     -   [ ] Unit Schemes
--   [ ] figure out scope accessor (method?)
+-   [x] figure out scope accessor (method?)
 -   [ ] create tests
 -   [ ]

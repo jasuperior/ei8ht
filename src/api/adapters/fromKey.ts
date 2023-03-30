@@ -5,19 +5,20 @@ import {
     UnitType,
     UnitKind,
     UnitScheme,
+    Unit,
 } from "../../model/unit.model";
 import { polytype } from "../domain/polytype";
 import { createUnit } from "../index";
 
 export const fromKey = <
-    Parent extends UnitScope,
+    Parent extends Scope,
     Initial extends Scope,
     Current extends Scope
 >(
     key: Primitive,
     init: Initial,
     branches: UnitClass<UnitScope<Parent, Initial, Current>, any, any>[]
-): UnitClass<UnitScope<Parent, Initial, Current>, Initial, Current> => {
+): Unit<Parent, Initial, Current> => {
     let unit: UnitClass;
     let scheme = () => {};
     const getScheme = (props: any) => {
@@ -27,6 +28,7 @@ export const fromKey = <
         return scheme;
     };
     let procedure = function* (props: Initial, branches: any[], unit: any) {
+        (<any>props).tag = key;
         unit = createUnit(scheme as any, props, ...branches);
         let [, init, output] = unit.scope;
         while (true) {
@@ -40,6 +42,7 @@ export const fromKey = <
                 scheme = currentScheme;
                 unit = createUnit(scheme as any, props, ...branches);
             } else {
+                // console.log("unit", init);
                 unit?.next(result);
             }
             output = unit.scope.chain[2];
@@ -49,14 +52,14 @@ export const fromKey = <
 };
 
 export const fromKeyAsync = <
-    Parent extends UnitScope,
+    Parent extends Scope,
     Initial extends Scope,
     Current extends Scope
 >(
     key: Primitive,
     init: Initial,
     branches: UnitClass<UnitScope<Parent, Initial, Current>, any, any>[]
-): UnitClass<UnitScope<Parent, Initial, Current>, Initial, Current> => {
+): Unit<Parent, Initial, Current> => {
     let unit: UnitClass;
     let scheme = () => {};
     const getScheme = (props: any) => {

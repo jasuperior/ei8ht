@@ -6,18 +6,19 @@ import {
     UnitClass,
     UnitType,
     UnitKind,
+    SyncUnit,
 } from "../../model/unit.model";
 import { polytype } from "../domain/polytype";
 
 export const fromSyncMethod = <
-    Parent extends UnitScope,
+    Parent extends Scope,
     Initial extends Scope,
     Current extends Scope
 >(
     method: SyncUnitMethod<Parent, Initial, Current>,
     init: Initial,
     branches: UnitClass<UnitScope<Parent, Initial, Current>, any, any>[]
-): SyncUnitClass<Parent, Initial, Current> => {
+): SyncUnit<Parent, Initial, Current> => {
     const scope = polytype(init);
     const onComplete = (output: Current) => {
         if (output !== undefined) {
@@ -36,20 +37,12 @@ export const fromSyncMethod = <
         branches,
         next: (input) => {
             scope._extend(input);
-            const output = method(
-                scope,
-                branches,
-                unit as SyncUnitClass<Parent, Initial, Current>
-            );
+            const output = method(scope, branches, unit as SyncUnit);
             return onComplete(output);
         },
-    } as Partial<SyncUnitClass<Parent, Initial, Current>>;
-    const output = method(
-        scope,
-        branches,
-        unit as SyncUnitClass<Parent, Initial, Current>
-    );
+    } as Partial<SyncUnit<Parent, Initial, Current>>;
+    const output = method(scope, branches, unit as SyncUnit);
     onComplete(output);
 
-    return unit as SyncUnitClass<Parent, Initial, Current>;
+    return unit as SyncUnit<Parent, Initial, Current>;
 };

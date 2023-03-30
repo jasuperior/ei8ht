@@ -45,11 +45,9 @@ export type UnitScope<
     Parent extends UnitScope = any,
     Initial extends Scope = any,
     Current extends Scope = any
-> = Polytype<Initial, Parent, Current> &
-    Parent &
-    Current &
-    Initial &
-    [parent: Parent, initial: Initial, current: Current];
+> = Polytype<Initial, Parent, Current> & Parent & Current & Initial;
+// &
+// [parent: Parent, initial: Initial, current: Current];
 
 // ---------------- Unit Methods  ---------------- //
 export type AsyncUnitMethod<
@@ -197,19 +195,19 @@ export type UnitClass<
     | SyncUnitClass<Parent, Initial, Current>;
 
 export type SyncUnit<
-    Parent extends Scope = Scope,
-    Initial extends Scope = Scope,
-    Current extends Scope = Scope
+    Parent extends Scope = any,
+    Initial extends Scope = any,
+    Current extends Scope = any
 > = SyncUnitClass<UnitScope<Scope, Scope, Parent>, Initial, Current>;
 
 export type AsyncUnit<
-    Parent extends Scope = Scope,
-    Initial extends Scope = Scope,
-    Current extends Scope = Scope
+    Parent extends Scope = any,
+    Initial extends Scope = any,
+    Current extends Scope = any
 > = AsyncUnitClass<UnitScope<Scope, Scope, Parent>, Initial, Current>;
 
 export type Unit<
-    Parent extends Scope = Scope,
-    Initial extends Scope = Scope,
-    Current extends Scope = Scope
+    Parent extends Scope = any,
+    Initial extends Scope = any,
+    Current extends Scope = any
 > = SyncUnit<Parent, Initial, Current> | AsyncUnit<Parent, Initial, Current>;

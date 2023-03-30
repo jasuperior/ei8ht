@@ -49,5 +49,8 @@
         "testMatch": [
             "**/test/**/*.test.ts"
         ]
+    },
+    "dependencies": {
+        "csstype": "^3.1.1"
     }
 }

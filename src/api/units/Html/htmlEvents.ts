@@ -78,3 +78,7 @@ export const htmlEvents = [
     "error",
     "abort",
 ] as const;
+
+export const htmlEventHandlers = htmlEvents.map(
+    (event) => `on${event[0].toUpperCase()}${event.slice(1)}`
+);
