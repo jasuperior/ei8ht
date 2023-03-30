@@ -14,4 +14,4 @@
     -   [ ] Unit Schemes
 -   [x] figure out scope accessor (method?)
 -   [ ] create tests
--   [ ]
+-   [ ] make yielding a boolean function cause the unit to pause updates until function returns true.

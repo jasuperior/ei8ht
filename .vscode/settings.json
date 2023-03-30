@@ -1,0 +1,4 @@
+{
+    "terminal.integrated.defaultProfile.osx": "bash",
+    "command-runner.terminal.shellArgs": ["-l"]
+}

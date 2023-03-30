@@ -25,13 +25,11 @@ const Example: SyncUnitProcedure = function* (_, branches, self) {
     );
     branches.push(component);
     yield;
-
-    // console.log("render", component);
     return {
         component,
     };
-} as SyncUnitProcedure;
-// const example = <Example />;
+};
+
 const unit: HtmlUnit = (
     <Html use="main" id="something">
         <div
@@ -50,9 +48,6 @@ const unit: HtmlUnit = (
                     count++;
                     e.target.innerHTML = `count ${count}`; //?
                 }}
-                // onBlur={() => {
-                //     console.log("blur");
-                // }}
             >
                 <div id="child" />
             </div>
@@ -67,8 +62,6 @@ const unit: HtmlUnit = (
     </Html>
 );
 
-// unit.branches[0].scope.container; //?
-// unit.branches[0].scope.container.outerHTML  //?
 let { child, container, remove, [0]: first } = from(unit);
 const example = from(child.get("example")!);
 container.outerHTML; //?
@@ -76,14 +69,5 @@ example.change({
     style: { width: 200, height: 200, borderRadius: 38 },
     className: "test",
 });
-// example.restyle({ width: 200, height: 200 });
-// example.scope.container.outerHTML; //?
-// remove(example); //?
-// first.remove();
 container.outerHTML; //?
-// child.get("child")!.scope.container.outerHTML; //?
-// child.get("input") //?
 child.get("parent")!.scope.trigger("click", {}); //?
-// child.get("parent")!.scope.trigger("click", {
-//     // target: child.get("input")!.scope.container,
-// });
