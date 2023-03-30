@@ -34,7 +34,8 @@
     "jest": {
         "moduleFileExtensions": [
             "ts",
-            "js"
+            "js",
+            "tsx"
         ],
         "transform": {
             "^.+\\.ts$": [
@@ -47,7 +48,7 @@
             }
         },
         "testMatch": [
-            "**/test/**/*.test.ts"
+            "**/tests/**/*.test.(ts|js|tsx)"
         ]
     },
     "dependencies": {

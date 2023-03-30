@@ -25,30 +25,25 @@ describe("fromSyncMethod", () => {
                 {},
                 []
             );
-            const result = unit.next({});
+            const result = unit.next({} as any);
             expect(result.done).toBe(true);
+            expect(result.value).toMatchObject({});
         });
         it("should call the method again", () => {
             const method = jest.fn(() => {
                 return {};
             });
             const unit = fromSyncMethod(method, {}, []);
-            unit.next({});
+            unit.next({} as any);
             expect(method).toHaveBeenCalledTimes(2);
         });
         it("should call the method with the input", () => {
-            const method = jest.fn(() => {
-                return {};
+            const method = jest.fn((props) => {
+                return props.chain[0];
             });
             const unit = fromSyncMethod(method, {}, []);
-            unit.next({ foo: "bar" });
-            //this doesnt work because the input is a polytype
-            // expect(method).toHaveBeenCalledWith(
-            //     expect.anything(),
-            //     expect.anything(),
-            //     expect.anything(),
-            //     { foo: "bar" }
-            // );
+            unit.next({ foo: "bar" } as any);
+            expect(method).toHaveLastReturnedWith({ foo: "bar" });
         });
     });
 });

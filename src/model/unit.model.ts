@@ -36,7 +36,7 @@ export enum UnitKind {
  * the output of a unit after its next method is called.
  * @template T the type of the unit's scope.
  */
-export type UnitFrame<T> = {
+export type UnitFrame<T = any> = {
     value: T;
     done: boolean;
 };

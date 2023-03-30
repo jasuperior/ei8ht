@@ -6,10 +6,16 @@ import {
     UnitKind,
     UnitScheme,
     Unit,
+    AsyncUnit,
 } from "../../model/unit.model";
 import { polytype } from "../domain/polytype";
 import { createUnit } from "../index";
 
+const reassignUnit = (unit: Unit, newUnit: Unit): void => {
+    unit.kind = newUnit.kind;
+    if (unit.type === UnitType.ASYNC)
+        unit.future = (newUnit as AsyncUnit).future;
+};
 export const fromKey = <
     Parent extends Scope,
     Initial extends Scope,
@@ -19,6 +25,7 @@ export const fromKey = <
     init: Initial,
     branches: UnitClass<UnitScope<Parent, Initial, Current>, any, any>[]
 ): Unit<Parent, Initial, Current> => {
+    let parentUnit: Unit;
     let unit: UnitClass;
     let scheme = () => {};
     const getScheme = (props: any) => {
@@ -41,14 +48,14 @@ export const fromKey = <
             if (!Object.is(currentScheme, scheme)) {
                 scheme = currentScheme;
                 unit = createUnit(scheme as any, props, ...branches);
+                reassignUnit(parentUnit, unit);
             } else {
-                // console.log("unit", init);
                 unit?.next(result);
             }
             output = unit.scope.chain[2];
         }
     } as unknown as UnitScheme<Parent, Initial, Current>;
-    return createUnit(procedure as any, init, ...branches);
+    return (parentUnit = createUnit(procedure as any, init, ...branches));
 };
 
 export const fromKeyAsync = <
@@ -60,7 +67,8 @@ export const fromKeyAsync = <
     init: Initial,
     branches: UnitClass<UnitScope<Parent, Initial, Current>, any, any>[]
 ): Unit<Parent, Initial, Current> => {
-    let unit: UnitClass;
+    let parentUnit: Unit;
+    let unit: Unit;
     let scheme = () => {};
     const getScheme = (props: any) => {
         if (typeof props[key as keyof typeof props] === "function") {
@@ -86,6 +94,7 @@ export const fromKeyAsync = <
             if (!Object.is(currentScheme, scheme)) {
                 scheme = currentScheme;
                 unit = createUnit(scheme as any, props, ...branches);
+                reassignUnit(parentUnit, unit);
                 await unit.future;
             } else {
                 await unit?.next(result);
@@ -93,5 +102,5 @@ export const fromKeyAsync = <
             output = unit.scope.chain[2];
         }
     } as unknown as UnitScheme<Parent, Initial, Current>;
-    return createUnit(procedure as any, init, ...branches);
+    return (parentUnit = createUnit(procedure as any, init, ...branches));
 };
