@@ -643,5 +643,5 @@ const Html = (props, branches, self) => {
   };
 };
 
-export { Html, NOOP, Polytype, createUnit, fromAsyncMethod, fromAsyncProcedure, fromKey, fromKeyAsync, fromSyncMethod, fromSyncProcedure, hasInstance, isAsync, isAsyncGenerator, isGenerator, isMap, isPromise, isSync, noop, polytype, toCompleteFrame, toFrame };
+export { Html, NOOP, Polytype, UnitKind, UnitState, UnitType, createUnit, fromAsyncMethod, fromAsyncProcedure, fromKey, fromKeyAsync, fromSyncMethod, fromSyncProcedure, hasInstance, isAsync, isAsyncGenerator, isGenerator, isMap, isPromise, isSync, noop, polytype, toCompleteFrame, toFrame };
 //# sourceMappingURL=lib.mjs.map

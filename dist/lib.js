@@ -648,6 +648,9 @@ const Html = (props, branches, self) => {
 exports.Html = Html;
 exports.NOOP = NOOP;
 exports.Polytype = Polytype;
+exports.UnitKind = UnitKind;
+exports.UnitState = UnitState;
+exports.UnitType = UnitType;
 exports.createUnit = createUnit;
 exports.fromAsyncMethod = fromAsyncMethod;
 exports.fromAsyncProcedure = fromAsyncProcedure;

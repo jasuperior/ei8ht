@@ -10,6 +10,9 @@ type MapLike<T, U> = {
 } & (T extends string ? Record<T, U> : {});
 type AsyncFunction<T extends any[] = any[], U = any> = (...args: T) => PromiseLike<U>;
 type SyncFunction<T extends any[] = any[], U = any> = (...args: T) => U;
+type GeneratorFunction$1<T extends any[] = any[], U = any> = (...args: T) => Generator<U>;
+type AsyncGeneratorFunction<T extends any[] = any[], U = any> = (...args: T) => AsyncGenerator<U>;
+type StringRecord = Record<string, any>;
 type KeyedScope<T extends Scope> = T & {
     tag?: string;
 };
@@ -72,6 +75,7 @@ type ParentScope<Parent = unknown, Initial = unknown, Current = unknown> = Paren
 declare namespace ParentScope {
     type Of<U extends Unit> = U extends Unit<infer P, infer I, infer C> ? ParentScope<P, I, C> : never;
 }
+type UnitScope<Parent extends ParentScope = unknown, Initial extends Scope = any, Current extends Scope = any> = Polytype<Initial, Parent, Current> & ParentScope<Parent, Initial, Current>;
 type AsyncWorkMethod<Parent extends Scope = any, Initial extends Scope = any, Current extends Scope = any> = (input: ParentScope<Parent, Initial, Current>, branches: Unit<ParentScope<Parent, Initial, Current>, any, any>[], self: AsyncUnit<Parent, Initial, Current>) => PromiseLike<Current>;
 type SyncWorkMethod<Parent extends Scope = any, Initial extends Scope = any, Current extends Scope = any> = (input: ParentScope<Parent, Initial, Current>, branches: Unit<ParentScope<Parent, Initial, Current>, any, any>[], self: SyncUnit<Parent, Initial, Current>) => Current;
 /**
@@ -306,6 +310,13 @@ declare namespace Unit {
     type Type = UnitType;
     type Kind = UnitKind;
 }
+declare namespace Branch {
+    type From<U extends Unit> = U extends Unit<infer P, infer I, infer C> ? Unit.Branch<P, I, C> : never;
+    type Of<U extends Unit, Initial extends Scope = any, Current extends Scope = Initial> = U extends Unit ? Unit<ParentScope.Of<U>, Initial, Current> : never;
+}
+declare namespace Branches {
+    type Of<U extends Unit> = U extends Unit<infer P, infer I, infer C> ? Branch.From<U>[] : never;
+}
 
 declare const fromAsyncMethod: <Parent extends Scope<string, any>, Initial extends Scope<string, any>, Current extends Scope<string, any>>(method: AsyncWorkMethod<Parent, Initial, Current>, init: Initial, branches: Unit<ParentScope<Parent, Initial, Current>, any, any>[]) => AsyncUnitClass<Parent, Initial, Current>;
 
@@ -381,4 +392,4 @@ declare namespace Html {
     type Children<I extends Scope = any, C extends Scope = I> = HtmlChildUnit<I, C>[];
 }
 
-export { Html, HtmlChildUnit, HtmlOutput, HtmlUnit, NOOP, Polytype, createUnit, fromAsyncMethod, fromAsyncProcedure, fromKey, fromKeyAsync, fromSyncMethod, fromSyncProcedure, hasInstance, isAsync, isAsyncGenerator, isGenerator, isMap, isPromise, isSync, noop, polytype, toCompleteFrame, toFrame };
+export { AsyncFunction, AsyncGeneratorFunction, AsyncUnit, AsyncUnitClass, AsyncWork, AsyncWorkMethod, AsyncWorkProcedure, Branch, Branches, GeneratorFunction$1 as GeneratorFunction, Html, HtmlChildUnit, HtmlOutput, HtmlUnit, Key, KeyedScope, MapLike, MethodicUnit, MethodicUnitClass, NOOP, ParentScope, Polytype, Primitive, ProceduralUnit, ProceduralUnitClass, Scope, ScopeFrom, StringRecord, SyncFunction, SyncUnit, SyncUnitClass, SyncWork, SyncWorkMethod, SyncWorkProcedure, Unit, UnitBase, UnitBranch, UnitBranches, UnitClass, UnitFrame, UnitKind, UnitOf, UnitScope, UnitState, UnitType, Work, WorkMethod, WorkOf, WorkProcedure, createUnit, fromAsyncMethod, fromAsyncProcedure, fromKey, fromKeyAsync, fromSyncMethod, fromSyncProcedure, hasInstance, isAsync, isAsyncGenerator, isGenerator, isMap, isPromise, isSync, noop, polytype, toCompleteFrame, toFrame };

@@ -11,7 +11,7 @@
         "build": "rollup -c",
         "lint": "eslint --fix 'src/**/*.ts'",
         "test": "jest --verbose",
-        "prepare": "yarn build",
+        "prepare": "npm run build",
         "version": "git add -A",
         "postversion": "git push && git push --tags"
     },
