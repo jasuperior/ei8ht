@@ -107,4 +107,12 @@ describe("createUnit", () => {
             expect(unit.scope.key).toBe(initialScope.key);
         });
     });
+    describe("when called with branches", () => {
+        it("should return a unit containing the branches", () => {
+            const branch = createUnit(jest.fn(), {});
+            const unit = createUnit(jest.fn(), {}, branch);
+            expect(unit.branches).toHaveLength(1);
+            expect(unit.branches).toContain(branch);
+        });
+    });
 });

@@ -1,6 +1,6 @@
 import { Scope } from "../../model/domain.model";
 import {
-    AsyncUnitProcedure,
+    AsyncWorkProcedure,
     AsyncUnitClass,
     UnitScope,
     UnitClass,
@@ -8,20 +8,24 @@ import {
     UnitType,
     UnitFrame,
     UnitState,
+    PolyScope,
+    Unit,
 } from "../../model/unit.model";
 import { polytype } from "../domain/polytype";
 
 export const fromAsyncProcedure = <
-    Parent extends UnitScope,
+    Parent extends Scope,
     Initial extends Scope,
     Current extends Scope
 >(
-    procedure: AsyncUnitProcedure<Parent, Initial, Current>,
+    procedure: AsyncWorkProcedure<Parent, Initial, Current>,
     init: Initial,
-    branches: UnitClass<UnitScope<Parent, Initial, Current>, any, any>[]
+    branches: Unit<PolyScope<Parent, Initial, Current>, any, any>[]
 ): AsyncUnitClass<Parent, Initial, Current> => {
     const scope = polytype(init);
-    const onComplete = (output: IteratorResult<Current, Current>) => {
+    const onComplete = (
+        output: IteratorResult<Current | void, Current | void>
+    ) => {
         duration--;
         if (output.value !== undefined) {
             scope._define(output.value);
@@ -37,6 +41,7 @@ export const fromAsyncProcedure = <
         kind: UnitKind.PROCEDURAL,
         scope,
         branches,
+        work: procedure,
         get state() {
             return duration === 0 ? UnitState.RESOLVED : UnitState.PENDING;
         },

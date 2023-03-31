@@ -1,9 +1,12 @@
 import {
     UnitScope,
-    UnitMethod,
+    WorkMethod,
     UnitClass,
-    SyncUnitMethod,
+    SyncWorkMethod,
     Unit,
+    Work,
+    PolyScope,
+    SyncWorkProcedure,
 } from "../../model/unit.model";
 import {
     fromAsyncProcedure,
@@ -21,9 +24,9 @@ export const createUnit = <
     Initial extends Scope = any,
     Current extends Scope = any
 >(
-    method: UnitMethod<Parent, Initial, Current> | Primitive,
+    method: Work<Parent, Initial, Current> | Primitive,
     init: Initial,
-    ...branches: UnitClass<UnitScope<Parent, Initial, Current>, any, any>[]
+    ...branches: UnitClass<PolyScope<Parent, Initial, Current>, any, any>[]
 ): Unit<Parent, Initial, Current> => {
     if (typeof method !== "function") {
         if ((init as any)?.await) {
@@ -33,12 +36,16 @@ export const createUnit = <
     } else if (isAsyncGenerator(method)) {
         return fromAsyncProcedure(method, init, branches);
     } else if (isGenerator(method)) {
-        return fromSyncProcedure(method, init, branches);
+        return fromSyncProcedure(
+            method as SyncWorkProcedure<Parent, Initial, Current>,
+            init,
+            branches
+        );
     } else if (isAsync(method)) {
         return fromAsyncMethod(method, init, branches);
     } else {
         return fromSyncMethod(
-            method as SyncUnitMethod<Parent, Initial, Current>,
+            method as SyncWorkMethod<Parent, Initial, Current>,
             init,
             branches
         ) as Unit<Parent, Initial, Current>;

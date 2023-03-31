@@ -26,7 +26,7 @@ const makeProxy = (unit: Unit): UnitAccessor<typeof unit> => {
     unitMap.set(unit, proxy);
     return proxy as unknown as UnitAccessor<typeof unit>;
 };
-export const from = <T extends Unit>(unit: T): UnitAccessor<T> => {
+export const from = <T extends Unit<any>>(unit: T): UnitAccessor<T> => {
     const proxy = unitMap.get(unit) || makeProxy(unit);
     return proxy!;
 };

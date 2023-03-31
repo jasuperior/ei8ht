@@ -3,7 +3,7 @@ import { isMap } from "../helpers/identity";
 
 const mapMethods = new Set(["get", "set", "has", "delete", "clear", "forEach"]);
 export class Polytype<
-    Current extends Scope,
+    Current extends Scope = any,
     Prev extends any = any,
     Next extends Scope = any
 > {

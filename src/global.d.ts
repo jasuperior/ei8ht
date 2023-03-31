@@ -1,8 +1,9 @@
 declare namespace JSX {
     declare type CSSProperties<L, T> = import("csstype").Properties<L, T>;
-    interface IntrinsicElements {
-        [elemName: string]: UnitElement;
-    }
+    type TagNames = keyof HTMLElementTagNameMap;
+    type IntrinsicElements = {
+        [element in TagNames]: UnitElement;
+    };
 
     /**
      * Copied from https://github.com/Pathgather/jsx-render-dom

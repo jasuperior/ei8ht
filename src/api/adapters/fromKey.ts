@@ -4,9 +4,10 @@ import {
     UnitClass,
     UnitType,
     UnitKind,
-    UnitScheme,
+    Work,
     Unit,
     AsyncUnit,
+    PolyScope,
 } from "../../model/unit.model";
 import { polytype } from "../domain/polytype";
 import { createUnit } from "../index";
@@ -23,9 +24,9 @@ export const fromKey = <
 >(
     key: Primitive,
     init: Initial,
-    branches: UnitClass<UnitScope<Parent, Initial, Current>, any, any>[]
+    branches: UnitClass<PolyScope<Parent, Initial, Current>, any, any>[]
 ): Unit<Parent, Initial, Current> => {
-    let parentUnit: Unit;
+    let parentUnit: Unit<Parent, Initial, Current>;
     let unit: UnitClass;
     let scheme = () => {};
     const getScheme = (props: any) => {
@@ -48,13 +49,13 @@ export const fromKey = <
             if (!Object.is(currentScheme, scheme)) {
                 scheme = currentScheme;
                 unit = createUnit(scheme as any, props, ...branches);
-                reassignUnit(parentUnit, unit);
+                reassignUnit(parentUnit as Unit, unit);
             } else {
                 unit?.next(result);
             }
             output = unit.scope.chain[2];
         }
-    } as unknown as UnitScheme<Parent, Initial, Current>;
+    } as unknown as Work<Parent, Initial, Current>;
     return (parentUnit = createUnit(procedure as any, init, ...branches));
 };
 
@@ -65,9 +66,9 @@ export const fromKeyAsync = <
 >(
     key: Primitive,
     init: Initial,
-    branches: UnitClass<UnitScope<Parent, Initial, Current>, any, any>[]
+    branches: UnitClass<PolyScope<Parent, Initial, Current>, any, any>[]
 ): Unit<Parent, Initial, Current> => {
-    let parentUnit: Unit;
+    let parentUnit: Unit<Parent, Initial, Current>;
     let unit: Unit;
     let scheme = () => {};
     const getScheme = (props: any) => {
@@ -94,13 +95,13 @@ export const fromKeyAsync = <
             if (!Object.is(currentScheme, scheme)) {
                 scheme = currentScheme;
                 unit = createUnit(scheme as any, props, ...branches);
-                reassignUnit(parentUnit, unit);
+                reassignUnit(parentUnit as Unit, unit);
                 await unit.future;
             } else {
                 await unit?.next(result);
             }
             output = unit.scope.chain[2];
         }
-    } as unknown as UnitScheme<Parent, Initial, Current>;
+    } as unknown as Work<Parent, Initial, Current>;
     return (parentUnit = createUnit(procedure as any, init, ...branches));
 };

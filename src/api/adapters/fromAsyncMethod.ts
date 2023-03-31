@@ -1,24 +1,25 @@
 import {
     UnitScope,
-    AsyncUnitMethod,
+    AsyncWorkMethod,
     UnitClass,
     AsyncUnitClass,
     UnitKind,
     UnitType,
     UnitState,
+    PolyScope,
 } from "../../model/unit.model";
 import { Scope } from "../../model/domain.model";
 import { polytype } from "../domain/polytype";
 import { toCompleteFrame } from "../helpers/transformers";
 
 export const fromAsyncMethod = <
-    Parent extends UnitScope,
+    Parent extends Scope,
     Initial extends Scope,
     Current extends Scope
 >(
-    method: AsyncUnitMethod<Parent, Initial, Current>,
+    method: AsyncWorkMethod<Parent, Initial, Current>,
     init: Initial,
-    branches: UnitClass<UnitScope<Parent, Initial, Current>, any, any>[]
+    branches: UnitClass<PolyScope<Parent, Initial, Current>, any, any>[]
 ): AsyncUnitClass<Parent, Initial, Current> => {
     const scope = polytype(init);
     const onComplete = (output: Current) => {
@@ -36,6 +37,7 @@ export const fromAsyncMethod = <
         kind: UnitKind.PURE,
         scope,
         branches,
+        work: method,
         get state() {
             return duration === 0 ? UnitState.RESOLVED : UnitState.PENDING;
         },

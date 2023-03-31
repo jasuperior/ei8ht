@@ -1,6 +1,6 @@
 import { hasInstance } from "../api/domain/constants";
 import { Polytype } from "../api/domain/polytype";
-import { Scope } from "./domain.model";
+import { Scope, StringRecord } from "./domain.model";
 
 /**
  * @description
@@ -41,95 +41,143 @@ export type UnitFrame<T = any> = {
     done: boolean;
 };
 
+export type PolyScope<
+    Parent = unknown,
+    Initial = unknown,
+    Current = unknown
+> = Parent & Initial & Current;
+
 export type UnitScope<
-    Parent extends UnitScope = any,
+    Parent extends PolyScope = unknown,
     Initial extends Scope = any,
     Current extends Scope = any
-> = Polytype<Initial, Parent, Current> & Parent & Current & Initial;
+> = Polytype<Initial, Parent, Current> & PolyScope<Parent, Initial, Current>;
 // &
 // [parent: Parent, initial: Initial, current: Current];
 
 // ---------------- Unit Methods  ---------------- //
-export type AsyncUnitMethod<
-    Parent extends UnitScope = any,
+export type AsyncWorkMethod<
+    Parent extends Scope = any,
     Initial extends Scope = any,
     Current extends Scope = any
 > = (
-    input: UnitScope<Parent, Initial, Current>,
-    branches: UnitClass<UnitScope<Parent, Initial, Current>, any, any>[],
-    self: AsyncUnitClass<Parent, Initial, Current>
+    input: PolyScope<Parent, Initial, Current>,
+    branches: Unit<PolyScope<Parent, Initial, Current>, any, any>[],
+    self: AsyncUnit<Parent, Initial, Current>
 ) => PromiseLike<Current>;
 
-export type SyncUnitMethod<
-    Parent extends UnitScope = any,
+export type SyncWorkMethod<
+    Parent extends Scope = any,
     Initial extends Scope = any,
     Current extends Scope = any
 > = (
-    input: UnitScope<Parent, Initial, Current>,
-    branches: UnitClass<UnitScope<Parent, Initial, Current>, any, any>[],
-    self: SyncUnitClass<Parent, Initial, Current>
+    input: PolyScope<Parent, Initial, Current>,
+    branches: Unit<PolyScope<Parent, Initial, Current>, any, any>[],
+    self: SyncUnit<Parent, Initial, Current>
 ) => Current;
 
 /**
  * @description
- * A unit method is a function that is used to define the behavior of a unit.
+ * A work method is a function that is used to define the behavior of a unit.
  * It can be either an async or sync method.
  */
-export type UnitMethod<
-    Parent extends UnitScope = any,
+export type WorkMethod<
+    Parent extends Scope = any,
     Initial extends Scope = any,
     Current extends Scope = any
 > =
-    | AsyncUnitMethod<Parent, Initial, Current>
-    | SyncUnitMethod<Parent, Initial, Current>;
+    | AsyncWorkMethod<Parent, Initial, Current>
+    | SyncWorkMethod<Parent, Initial, Current>;
 
 // ---------------- Unit Procedures  ---------------- //
-export type AsyncUnitProcedure<
-    Parent extends UnitScope = any,
+export type AsyncWorkProcedure<
+    Parent extends Scope = any,
     Initial extends Scope = any,
     Current extends Scope = any
 > = (
-    input: UnitScope<Parent, Initial, Current>,
-    branches: UnitClass<UnitScope<Parent, Initial, Current>, any, any>[],
-    self: AsyncUnitClass<Parent, Initial, Current>
-) => AsyncGenerator<Current, Current, Parent>;
+    input: PolyScope<Parent, Initial, Current>,
+    branches: Unit<PolyScope<Parent, Initial, Current>, any, any>[],
+    self: AsyncUnit<Parent, Initial, Current>
+) => AsyncGenerator<Current | void, Current | void, Parent>;
 
-export type SyncUnitProcedure<
-    Parent extends UnitScope = any,
+export type SyncWorkProcedure<
+    Parent extends Scope = any,
     Initial extends Scope = any,
     Current extends Scope = any
 > = (
-    input: UnitScope<Parent, Initial, Current>,
-    branches: UnitClass<UnitScope<Parent, Initial, Current>, any, any>[],
-    self: SyncUnitClass<Parent, Initial, Current>
-) => Generator<Current, Current, Parent>;
+    input: PolyScope<Parent, Initial, Current>,
+    branches: Unit<PolyScope<Parent, Initial, Current>, any, any>[],
+    self: SyncUnit<Parent, Initial, Current>
+) => Generator<Current | void, Current | void, Parent>;
 
 /**
  * @description
- * A unit procedure is a generator function that is used to define the behavior
+ * A work procedure is a generator function that is used to define the behavior
  * of a unit. It can be either an async or sync procedure.
  */
-export type UnitProcedure<
-    Parent extends UnitScope = any,
+export type WorkProcedure<
+    Parent extends Scope = any,
     Initial extends Scope = any,
     Current extends Scope = any
 > =
-    | AsyncUnitProcedure<Parent, Initial, Current>
-    | SyncUnitProcedure<Parent, Initial, Current>;
+    | AsyncWorkProcedure<Parent, Initial, Current>
+    | SyncWorkProcedure<Parent, Initial, Current>;
+
+export type SyncWork<
+    P extends Scope = any,
+    I extends Scope = P,
+    C extends Scope = I
+> =
+    | SyncWorkMethod<PolyScope<unknown, unknown, P>, I, C>
+    | SyncWorkProcedure<PolyScope<unknown, unknown, P>, I, C>;
+
+export type AsyncWork<
+    P extends Scope = any,
+    I extends Scope = P,
+    C extends Scope = I
+> =
+    | AsyncWorkMethod<PolyScope<unknown, unknown, P>, I, C>
+    | AsyncWorkProcedure<PolyScope<unknown, unknown, P>, I, C>;
 
 /**
  * @description
- * A unit scheme is a function that is used to define the behavior of a unit.
+ * Work is a function that is used to define the behavior of a unit.
  * It can be either an async or sync method or procedure.
  */
-export type UnitScheme<
-    Parent extends UnitScope = any,
-    Initial extends Scope = any,
-    Current extends Scope = any
-> =
-    | UnitMethod<Parent, Initial, Current>
-    | UnitProcedure<Parent, Initial, Current>;
+export type Work<
+    Parent extends Scope = any,
+    Initial extends Scope = Parent,
+    Current extends Scope = Initial
+> = SyncWork<Parent, Initial, Current> | AsyncWork<Parent, Initial, Current>;
 
+export type WorkOf<U extends Unit> = U["work"];
+export namespace Work {
+    export type Sync<
+        Parent extends Scope = any,
+        Initial extends Scope = Parent,
+        Current extends Scope = Initial
+    > = SyncWork<Parent, Initial, Current>;
+
+    export type Async<
+        Parent extends Scope = any,
+        Initial extends Scope = Parent,
+        Current extends Scope = Initial
+    > = AsyncWork<Parent, Initial, Current>;
+
+    export type Method<
+        Parent extends Scope = any,
+        Initial extends Scope = Parent,
+        Current extends Scope = Initial
+    > = WorkMethod<Parent, Initial, Current>;
+
+    export type Procedure<
+        Parent extends Scope = any,
+        Initial extends Scope = Parent,
+        Current extends Scope = Initial
+    > = WorkProcedure<Parent, Initial, Current>;
+
+    export type Of<U extends Unit> = WorkOf<U>;
+}
 // ---------------- Unit Primitives  ---------------- //
 /**
  * @description
@@ -137,18 +185,19 @@ export type UnitScheme<
  *  It is used to define the common properties of all units.
  */
 export type UnitBase<
-    Parent extends UnitScope = any,
+    Parent extends Scope = any,
     Initial extends Scope = any,
     Current extends Scope = any
 > = {
     type: UnitType;
     kind: UnitKind;
-    scope: UnitScope<Parent, Initial, Current>;
-    branches: UnitClass<UnitScope<Parent, Initial, Current>, any, any>[];
+    scope: PolyScope<Parent, Initial, Current>;
+    branches: Unit<PolyScope<Parent, Initial, Current>, any, any>[];
+    work: Work<Parent, Initial, Current>;
     next: (
-        value: Parent
+        value: Parent | Initial
     ) => UnitFrame<Current> | PromiseLike<UnitFrame<Current>>;
-    [hasInstance]: Set<UnitScheme>;
+    [hasInstance]: Set<Work>;
 };
 
 /**
@@ -157,14 +206,14 @@ export type UnitBase<
  * properties of an async unit.
  */
 export interface AsyncUnitClass<
-    Parent extends UnitScope = any,
+    Parent extends Scope = any,
     Initial extends Scope = any,
     Current extends Scope = any
 > extends UnitBase<Parent, Initial, Current> {
     type: UnitType.ASYNC;
     future?: PromiseLike<UnitFrame<Current>>;
     state: UnitState;
-    next: (value: Parent) => PromiseLike<UnitFrame<Current>>;
+    next: (value: Parent | Initial) => PromiseLike<UnitFrame<Current>>;
 }
 
 /**
@@ -173,12 +222,12 @@ export interface AsyncUnitClass<
  * properties of a sync unit.
  */
 export interface SyncUnitClass<
-    Parent extends UnitScope = any,
+    Parent extends Scope = any,
     Initial extends Scope = any,
     Current extends Scope = any
 > extends UnitBase<Parent, Initial, Current> {
     type: UnitType.SYNC;
-    next: (value: Parent) => UnitFrame<Current>;
+    next: (value: Parent | Initial) => UnitFrame<Current>;
 }
 
 /**
@@ -187,7 +236,7 @@ export interface SyncUnitClass<
  * properties of a unit.
  */
 export type UnitClass<
-    Parent extends UnitScope = any,
+    Parent extends Scope = any,
     Initial extends Scope = any,
     Current extends Scope = any
 > =
@@ -196,18 +245,47 @@ export type UnitClass<
 
 export type SyncUnit<
     Parent extends Scope = any,
-    Initial extends Scope = any,
-    Current extends Scope = any
-> = SyncUnitClass<UnitScope<Scope, Scope, Parent>, Initial, Current>;
+    Initial extends Scope = Parent,
+    Current extends Scope = Initial
+> = SyncUnitClass<Parent, Initial, Current>;
 
 export type AsyncUnit<
     Parent extends Scope = any,
-    Initial extends Scope = any,
-    Current extends Scope = any
-> = AsyncUnitClass<UnitScope<Scope, Scope, Parent>, Initial, Current>;
+    Initial extends Scope = Parent,
+    Current extends Scope = Initial
+> = AsyncUnitClass<Parent, Initial, Current>;
 
 export type Unit<
     Parent extends Scope = any,
-    Initial extends Scope = any,
-    Current extends Scope = any
+    Initial extends Scope = Parent,
+    Current extends Scope = Initial
 > = SyncUnit<Parent, Initial, Current> | AsyncUnit<Parent, Initial, Current>;
+
+export type UnitOf<W> = W extends Work<infer P, infer I, infer C>
+    ? W extends AsyncWork<P, I, C>
+        ? AsyncUnit<P, I, C>
+        : SyncUnit<P, I, C>
+    : never;
+export namespace Unit {
+    export type Base<
+        Parent extends Scope = any,
+        Initial extends Scope = any,
+        Current extends Scope = any
+    > = UnitBase<Parent, Initial, Current>;
+    export type Class<
+        Parent extends Scope = any,
+        Initial extends Scope = any,
+        Current extends Scope = any
+    > = UnitClass<Parent, Initial, Current>;
+    export type Async<
+        Parent extends Scope = any,
+        Initial extends Scope = any,
+        Current extends Scope = any
+    > = AsyncUnitClass<Parent, Initial, Current>;
+    export type Sync<
+        Parent extends Scope = any,
+        Initial extends Scope = any,
+        Current extends Scope = any
+    > = SyncUnitClass<Parent, Initial, Current>;
+    export type Of<W> = UnitOf<W>;
+}

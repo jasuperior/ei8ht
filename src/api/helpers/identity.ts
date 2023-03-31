@@ -1,5 +1,5 @@
 import { AsyncFunction, MapLike, SyncFunction } from "../../model/domain.model";
-import { AsyncUnitProcedure } from "../../model/unit.model";
+import { AsyncWorkProcedure } from "../../model/unit.model";
 
 export const isSync = (fn: Function): fn is SyncFunction => {
     return fn.constructor.name === "Function";
@@ -12,7 +12,7 @@ export const isGenerator = (fn: Function): fn is GeneratorFunction => {
 };
 export const isAsyncGenerator = (
     fn: Function
-): fn is AsyncUnitProcedure<any, any, any> => {
+): fn is AsyncWorkProcedure<any, any, any> => {
     return fn.constructor.name === "AsyncGeneratorFunction";
 };
 export const isPromise = (fn: any): fn is Promise<any> => {

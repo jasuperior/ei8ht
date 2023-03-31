@@ -1,12 +1,12 @@
-import { MapLike, Scope } from "../../../model/domain.model";
+import { MapLike, Scope, ScopeOf } from "../../../model/domain.model";
 import {
     AsyncUnitClass,
-    AsyncUnitMethod,
+    AsyncWorkMethod,
     SyncUnit,
     SyncUnitClass,
     Unit,
     UnitClass,
-    UnitScheme,
+    Work,
     UnitScope,
 } from "../../../model/unit.model";
 import {
@@ -21,21 +21,26 @@ import { htmlTags } from "./htmlTags";
 
 // ------------------ Html Types ------------------
 type HtmlTags = keyof HTMLElementTagNameMap;
-type HtmlProps =
-    | {
-          use: HtmlTags;
-          id?: string | number;
-          place?: never;
-      }
-    | {
-          use?: never;
-          place: string;
-      };
-interface HtmlOutput extends MapLike<HtmlTags, UnitScheme>, JSX.UnitElement {
+type HtmlInput = ScopeOf<
+    (
+        | {
+              use: HtmlTags;
+              id?: string | number;
+              place?: never;
+          }
+        | {
+              use?: never;
+              place: string;
+          }
+    ) & {
+        event?: string;
+    }
+>;
+interface IHtmlOutput extends JSX.UnitElement {
     root: HTMLElement;
     container: HTMLElement;
     children: Map<HTMLElement, Unit>;
-    child: Map<string, Unit<HtmlOutput, HtmlOutput, HtmlOutput>>;
+    child: Map<string, Unit<HtmlOutput>>;
     remove: (id: Unit | string) => boolean;
     trigger: (event: string, payload?: any) => void;
     restyle: (
@@ -47,10 +52,13 @@ interface HtmlOutput extends MapLike<HtmlTags, UnitScheme>, JSX.UnitElement {
     type?: string;
     payload?: any;
 }
+type HtmlOutput = IHtmlOutput &
+    MapLike<HtmlTags, Unit<Scope, Scope, IHtmlOutput>>;
+type HtmlProps = UnitScope<HtmlInput, HtmlInput, HtmlOutput>;
 
 const resolveSelector = (
-    children: Map<string, UnitClass>,
-    selector: Unit | string
+    children: Map<string, Unit>,
+    selector: Unit<any> | string
 ): [unit: Unit | undefined, id: string] => {
     let unit: Unit | undefined;
     let id: string;
@@ -69,11 +77,11 @@ const resolveSelector = (
 
 // ------------------ Html Element Unit ------------------
 const createElement = function* (
-    props: UnitScope,
+    props: HtmlProps,
     branches: any[],
     self: UnitClass
 ) {
-    const child = document.createElement(props.tag);
+    const child = document.createElement(props.tag!);
     child.id = props.id;
     let output: Scope | undefined = {
         container: child,
@@ -87,10 +95,13 @@ const createElement = function* (
     props.children.set(child, self);
     props.container.appendChild(child);
     while (true) {
-        const frame = (yield output) as unknown as UnitScope;
+        const frame = (yield output) as unknown as HtmlProps;
         if (frame.type === "event") {
             // console.log("child", frame.event, props.id);
-            props[`on${frame.event}`]?.(frame.payload, child);
+            props[`on${frame.event!}` as keyof HtmlOutput]?.(
+                frame.payload,
+                child
+            );
         }
         if (frame.type === "update") {
             props.onUpdate?.(frame.payload, child);
@@ -115,9 +126,9 @@ const createElement = function* (
  * </Html>
  */
 export const Html = (
-    props: HtmlProps,
+    props: HtmlInput,
     branches: SyncUnit<{ id: string }>[],
-    self: SyncUnit<HtmlProps, HtmlProps, HtmlOutput>
+    self: SyncUnit<HtmlInput, HtmlInput, HtmlOutput>
 ) => {
     const root = isPlacement(props)
         ? document.querySelector(props.place)!
@@ -205,4 +216,4 @@ export const Html = (
     } as HtmlOutput;
 };
 
-export type HtmlUnit = SyncUnit<HtmlProps, HtmlProps, HtmlOutput>;
+export type HtmlUnit = SyncUnit<HtmlInput, HtmlInput, HtmlOutput>;

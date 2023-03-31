@@ -1,34 +1,40 @@
 import { createUnit } from "../api/factories/createUnit";
 import { from } from "../api/hooks/from";
 import { Html, HtmlUnit } from "../api/units/Html/Html";
+import { Scope } from "../model";
 
 import {
-    SyncUnitProcedure,
-    UnitProcedure,
-    UnitScheme,
+    SyncWorkProcedure,
+    WorkProcedure,
+    Work,
+    UnitOf,
+    SyncWork,
+    Unit,
 } from "../model/unit.model";
 
 let count = 0;
-const Example: SyncUnitProcedure = function* (_, branches, self) {
-    const component = (
-        <div
-            id="example"
-            onRemove={() => {
-                branches.splice(branches.indexOf(component), 1);
-            }}
-            onUpdate={(payload) => {
-                console.log("update", payload.detail);
-            }}
-        >
-            Example
-        </div>
-    );
-    branches.push(component);
-    yield;
-    return {
-        component,
+const Example: SyncWork<{ other?: string }, { component?: string }> =
+    function* (_, branches, self) {
+        const component = (
+            <div
+                id="example"
+                onRemove={() => {
+                    branches.splice(branches.indexOf(component), 1);
+                }}
+                onUpdate={(payload) => {
+                    console.log("update", payload.detail);
+                }}
+            >
+                Example
+            </div>
+        );
+        _.other; //?
+        branches.push(component);
+        yield;
+        return {
+            component,
+        };
     };
-};
 
 const unit: HtmlUnit = (
     <Html use="main" id="something">
@@ -71,3 +77,7 @@ example.change({
 });
 container.outerHTML; //?
 child.get("parent")!.scope.trigger("click", {}); //?
+
+let unit2: Unit.Of<typeof Example> = <Example component="test" other="sdfs" />;
+let unit3: Unit;
+let u: Work.Of<typeof unit2>;

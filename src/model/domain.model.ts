@@ -3,7 +3,7 @@ export type Key = string | symbol | number;
 export type MapLike<T, U> = {
     get(key: T): U | void;
     set(key: T, value: U): void;
-};
+} & (T extends string ? Record<T, U> : {});
 export type AsyncFunction<T extends any[] = any[], U = any> = (
     ...args: T
 ) => PromiseLike<U>;
@@ -15,4 +15,19 @@ export type AsyncGeneratorFunction<T extends any[] = any[], U = any> = (
     ...args: T
 ) => AsyncGenerator<U>;
 
-export type Scope<T extends Key = any, U = any> = Record<T, U> | MapLike<T, U>;
+export type StringRecord = Record<string, any>;
+export type Scope<T extends Key = string, U = any> =
+    | Record<T, U>
+    | MapLike<T, U>;
+
+export type ScopeOf<T extends Scope> = T & { tag?: string };
+export type ScopeFrom<T extends Record<string, any> | Scope> = T extends Record<
+    infer K,
+    infer V
+>
+    ? Scope<K, V>
+    : T;
+export namespace Scope {
+    export type Of<T extends Scope> = ScopeOf<T>;
+    export type From<T extends Record<string, any> | Scope> = ScopeFrom<T>;
+}
