@@ -1,13 +1,4 @@
-import {
-    UnitScope,
-    WorkMethod,
-    UnitClass,
-    SyncWorkMethod,
-    Unit,
-    Work,
-    PolyScope,
-    SyncWorkProcedure,
-} from "../../model/unit.model";
+import { Unit, Work } from "../../model/unit.model";
 import {
     fromAsyncProcedure,
     fromSyncProcedure,
@@ -26,7 +17,7 @@ export const createUnit = <
 >(
     method: Work<Parent, Initial, Current> | Primitive,
     init: Initial,
-    ...branches: UnitClass<PolyScope<Parent, Initial, Current>, any, any>[]
+    ...branches: Unit.Branches<Parent, Initial, Current>
 ): Unit<Parent, Initial, Current> => {
     if (typeof method !== "function") {
         if ((init as any)?.await) {
@@ -34,18 +25,26 @@ export const createUnit = <
         }
         return fromKey(method, init, branches);
     } else if (isAsyncGenerator(method)) {
-        return fromAsyncProcedure(method, init, branches);
+        return fromAsyncProcedure(
+            method as Work.Pursuit<Parent, Initial, Current>,
+            init,
+            branches
+        );
     } else if (isGenerator(method)) {
         return fromSyncProcedure(
-            method as SyncWorkProcedure<Parent, Initial, Current>,
+            method as Work.Process<Parent, Initial, Current>,
             init,
             branches
         );
     } else if (isAsync(method)) {
-        return fromAsyncMethod(method, init, branches);
+        return fromAsyncMethod(
+            method as Work.Goal<Parent, Initial, Current>,
+            init,
+            branches
+        );
     } else {
         return fromSyncMethod(
-            method as SyncWorkMethod<Parent, Initial, Current>,
+            method as Work.Step<Parent, Initial, Current>,
             init,
             branches
         ) as Unit<Parent, Initial, Current>;

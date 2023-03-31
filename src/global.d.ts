@@ -1,5 +1,7 @@
 declare namespace JSX {
     declare type CSSProperties<L, T> = import("csstype").Properties<L, T>;
+    declare type Unit<T = any> = import("./model").Unit<T>;
+
     type TagNames = keyof HTMLElementTagNameMap;
     type IntrinsicElements = {
         [element in TagNames]: UnitElement;
@@ -181,7 +183,7 @@ declare namespace JSX {
     };
 
     interface EventHandler<E extends SyntheticEvent> {
-        (event: E): void;
+        (event: E, unit?: Unit): void;
     }
 
     type ClipboardEventHandler = EventHandler<SyntheticEvent<ClipboardEvent>>;

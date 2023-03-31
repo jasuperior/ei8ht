@@ -1,12 +1,9 @@
-import { MapLike, Scope, ScopeOf } from "../../../model/domain.model";
+import { MapLike, Scope, KeyedScope } from "../../../model/domain.model";
 import {
-    AsyncUnitClass,
-    AsyncWorkMethod,
+    ParentScope,
     SyncUnit,
-    SyncUnitClass,
     Unit,
     UnitClass,
-    Work,
     UnitScope,
 } from "../../../model/unit.model";
 import {
@@ -21,7 +18,7 @@ import { htmlTags } from "./htmlTags";
 
 // ------------------ Html Types ------------------
 type HtmlTags = keyof HTMLElementTagNameMap;
-type HtmlInput = ScopeOf<
+type HtmlInput = KeyedScope<
     (
         | {
               use: HtmlTags;
@@ -40,7 +37,7 @@ interface IHtmlOutput extends JSX.UnitElement {
     root: HTMLElement;
     container: HTMLElement;
     children: Map<HTMLElement, Unit>;
-    child: Map<string, Unit<HtmlOutput>>;
+    child: Map<string, Unit<HtmlOutput, HtmlOutput, HtmlOutput>>;
     remove: (id: Unit | string) => boolean;
     trigger: (event: string, payload?: any) => void;
     restyle: (
@@ -52,7 +49,7 @@ interface IHtmlOutput extends JSX.UnitElement {
     type?: string;
     payload?: any;
 }
-type HtmlOutput = IHtmlOutput &
+export type HtmlOutput = IHtmlOutput &
     MapLike<HtmlTags, Unit<Scope, Scope, IHtmlOutput>>;
 type HtmlProps = UnitScope<HtmlInput, HtmlInput, HtmlOutput>;
 
@@ -104,7 +101,7 @@ const createElement = function* (
             );
         }
         if (frame.type === "update") {
-            props.onUpdate?.(frame.payload, child);
+            props.onUpdate?.(frame.payload, self);
         }
         output = undefined;
     }
@@ -113,7 +110,7 @@ const createElement = function* (
 // ------------------ Html Unit ------------------
 /**
  * @description
- * Html is a unit that can be used to create an html elements context.
+ * Html is a unit that can be used to create a context for html elements.
  * @param props - The props of the unit.
  * @param branches - The branches of the unit.
  * @param self - The unit itself.
@@ -216,4 +213,20 @@ export const Html = (
     } as HtmlOutput;
 };
 
-export type HtmlUnit = SyncUnit<HtmlInput, HtmlInput, HtmlOutput>;
+export type HtmlUnit = Unit.Eager<HtmlInput, HtmlInput, HtmlOutput>;
+export type HtmlChildUnit<
+    I extends Scope = any,
+    C extends Scope = I
+> = Unit.Eager<Partial<ParentScope.Of<HtmlUnit>>, I, C>;
+
+export namespace Html {
+    export type Unit = HtmlUnit;
+    export type Child<
+        I extends Scope = any,
+        C extends Scope = I
+    > = HtmlChildUnit<I, C>;
+    export type Children<
+        I extends Scope = any,
+        C extends Scope = I
+    > = HtmlChildUnit<I, C>[];
+}

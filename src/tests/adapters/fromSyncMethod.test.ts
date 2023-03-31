@@ -14,7 +14,7 @@ describe("fromSyncMethod", () => {
             []
         );
         expect(unit.type).toBe(UnitType.SYNC);
-        expect(unit.kind).toBe(UnitKind.PURE);
+        expect(unit.kind).toBe(UnitKind.METHODIC);
     });
     describe("when next is called", () => {
         it("should return a done iterator result", () => {

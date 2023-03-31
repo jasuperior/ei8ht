@@ -6,8 +6,9 @@ import {
     UnitScope,
     UnitClass,
     UnitType,
-    PolyScope,
+    ParentScope,
     SyncUnit,
+    Unit,
 } from "../../model/unit.model";
 import { polytype } from "../domain/polytype";
 
@@ -18,7 +19,7 @@ export const fromSyncProcedure = <
 >(
     procedure: SyncWorkProcedure<Parent, Initial, Current>,
     init: Initial,
-    branches: UnitClass<PolyScope<Parent, Initial, Current>, any, any>[]
+    branches: Unit<ParentScope<Parent, Initial, Current>, any, any>[]
 ): SyncUnit<Parent, Initial, Current> => {
     const scope = polytype(init);
     const onComplete = (

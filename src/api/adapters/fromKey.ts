@@ -7,7 +7,7 @@ import {
     Work,
     Unit,
     AsyncUnit,
-    PolyScope,
+    ParentScope,
 } from "../../model/unit.model";
 import { polytype } from "../domain/polytype";
 import { createUnit } from "../index";
@@ -24,7 +24,7 @@ export const fromKey = <
 >(
     key: Primitive,
     init: Initial,
-    branches: UnitClass<PolyScope<Parent, Initial, Current>, any, any>[]
+    branches: Unit<ParentScope<Parent, Initial, Current>, any, any>[]
 ): Unit<Parent, Initial, Current> => {
     let parentUnit: Unit<Parent, Initial, Current>;
     let unit: UnitClass;
@@ -66,7 +66,7 @@ export const fromKeyAsync = <
 >(
     key: Primitive,
     init: Initial,
-    branches: UnitClass<PolyScope<Parent, Initial, Current>, any, any>[]
+    branches: Unit<ParentScope<Parent, Initial, Current>, any, any>[]
 ): Unit<Parent, Initial, Current> => {
     let parentUnit: Unit<Parent, Initial, Current>;
     let unit: Unit;

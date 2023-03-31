@@ -7,7 +7,8 @@ import {
     UnitType,
     UnitKind,
     SyncUnit,
-    PolyScope,
+    ParentScope,
+    Unit,
 } from "../../model/unit.model";
 import { polytype } from "../domain/polytype";
 
@@ -18,7 +19,7 @@ export const fromSyncMethod = <
 >(
     method: SyncWorkMethod<Parent, Initial, Current>,
     init: Initial,
-    branches: UnitClass<PolyScope<Parent, Initial, Current>, any, any>[]
+    branches: Unit<ParentScope<Parent, Initial, Current>, any, any>[]
 ): SyncUnit<Parent, Initial, Current> => {
     const scope = polytype(init);
     const onComplete = (output: Current) => {
@@ -33,7 +34,7 @@ export const fromSyncMethod = <
     };
     const unit = {
         type: UnitType.SYNC,
-        kind: UnitKind.PURE,
+        kind: UnitKind.METHODIC,
         scope,
         branches,
         work: method,

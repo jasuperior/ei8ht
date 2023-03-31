@@ -1,14 +1,12 @@
 import { Scope } from "../../model/domain.model";
 import {
     AsyncWorkProcedure,
-    AsyncUnitClass,
-    UnitScope,
-    UnitClass,
+    AsyncUnit,
     UnitKind,
     UnitType,
     UnitFrame,
     UnitState,
-    PolyScope,
+    ParentScope,
     Unit,
 } from "../../model/unit.model";
 import { polytype } from "../domain/polytype";
@@ -20,8 +18,8 @@ export const fromAsyncProcedure = <
 >(
     procedure: AsyncWorkProcedure<Parent, Initial, Current>,
     init: Initial,
-    branches: Unit<PolyScope<Parent, Initial, Current>, any, any>[]
-): AsyncUnitClass<Parent, Initial, Current> => {
+    branches: Unit<ParentScope<Parent, Initial, Current>, any, any>[]
+): AsyncUnit<Parent, Initial, Current> => {
     const scope = polytype(init);
     const onComplete = (
         output: IteratorResult<Current | void, Current | void>
@@ -51,7 +49,7 @@ export const fromAsyncProcedure = <
                 generator = procedure(
                     scope,
                     branches,
-                    unit as AsyncUnitClass<Parent, Initial, Current>
+                    unit as AsyncUnit<Parent, Initial, Current>
                 );
             }
             if (unit.future) {
@@ -63,16 +61,16 @@ export const fromAsyncProcedure = <
             }
             return unit.future;
         },
-    } as Partial<AsyncUnitClass<Parent, Initial, Current>>;
+    } as Partial<AsyncUnit<Parent, Initial, Current>>;
     let generator = procedure(
         scope,
         branches,
-        unit as AsyncUnitClass<Parent, Initial, Current>
+        unit as AsyncUnit<Parent, Initial, Current>
     );
     let lastFrame = {
         value: undefined,
         done: false,
     } as unknown as UnitFrame<Current>;
     unit.future = generator.next(scope).then(onComplete);
-    return unit as AsyncUnitClass<Parent, Initial, Current>;
+    return unit as AsyncUnit<Parent, Initial, Current>;
 };

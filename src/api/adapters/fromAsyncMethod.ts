@@ -1,12 +1,12 @@
 import {
-    UnitScope,
     AsyncWorkMethod,
     UnitClass,
     AsyncUnitClass,
     UnitKind,
     UnitType,
     UnitState,
-    PolyScope,
+    ParentScope,
+    Unit,
 } from "../../model/unit.model";
 import { Scope } from "../../model/domain.model";
 import { polytype } from "../domain/polytype";
@@ -19,7 +19,7 @@ export const fromAsyncMethod = <
 >(
     method: AsyncWorkMethod<Parent, Initial, Current>,
     init: Initial,
-    branches: UnitClass<PolyScope<Parent, Initial, Current>, any, any>[]
+    branches: Unit<ParentScope<Parent, Initial, Current>, any, any>[]
 ): AsyncUnitClass<Parent, Initial, Current> => {
     const scope = polytype(init);
     const onComplete = (output: Current) => {
@@ -34,7 +34,7 @@ export const fromAsyncMethod = <
     let duration = 0;
     const unit = {
         type: UnitType.ASYNC,
-        kind: UnitKind.PURE,
+        kind: UnitKind.METHODIC,
         scope,
         branches,
         work: method,

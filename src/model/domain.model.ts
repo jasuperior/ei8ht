@@ -1,3 +1,5 @@
+import { Unit } from "./unit.model";
+
 export type Primitive = string | boolean | number;
 export type Key = string | symbol | number;
 export type MapLike<T, U> = {
@@ -20,7 +22,7 @@ export type Scope<T extends Key = string, U = any> =
     | Record<T, U>
     | MapLike<T, U>;
 
-export type ScopeOf<T extends Scope> = T & { tag?: string };
+export type KeyedScope<T extends Scope> = T & { tag?: string };
 export type ScopeFrom<T extends Record<string, any> | Scope> = T extends Record<
     infer K,
     infer V
@@ -28,6 +30,8 @@ export type ScopeFrom<T extends Record<string, any> | Scope> = T extends Record<
     ? Scope<K, V>
     : T;
 export namespace Scope {
-    export type Of<T extends Scope> = ScopeOf<T>;
+    export type Of<U extends Unit> = U extends Unit<infer T, infer V, infer W>
+        ? T & V & W
+        : never;
     export type From<T extends Record<string, any> | Scope> = ScopeFrom<T>;
 }

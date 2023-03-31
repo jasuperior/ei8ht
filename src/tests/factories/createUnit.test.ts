@@ -10,17 +10,17 @@ import {
 
 describe("createUnit", () => {
     describe("when called with a sync unit method", () => {
-        it("should return a pure sync unit", () => {
+        it("should return a methodic sync unit", () => {
             const unit = createUnit(() => ({}), {});
             expect(unit.type).toBe(UnitType.SYNC);
-            expect(unit.kind).toBe(UnitKind.PURE);
+            expect(unit.kind).toBe(UnitKind.METHODIC);
         });
     });
     describe("when called with an async unit method", () => {
-        it("should return a pure async unit", () => {
+        it("should return a methodic async unit", () => {
             const unit = createUnit(async () => ({}), {});
             expect(unit.type).toBe(UnitType.ASYNC);
-            expect(unit.kind).toBe(UnitKind.PURE);
+            expect(unit.kind).toBe(UnitKind.METHODIC);
         });
     });
     describe("when called with a sync unit procedure", () => {
