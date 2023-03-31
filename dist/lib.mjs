@@ -10,7 +10,7 @@ var UnitState = /* @__PURE__ */ ((UnitState2) => {
   return UnitState2;
 })(UnitState || {});
 var UnitKind = /* @__PURE__ */ ((UnitKind2) => {
-  UnitKind2["PURE"] = "pure";
+  UnitKind2["METHODIC"] = "methodic";
   UnitKind2["PROCEDURAL"] = "procedural";
   return UnitKind2;
 })(UnitKind || {});
@@ -116,9 +116,10 @@ const fromAsyncMethod = (method, init, branches) => {
   let duration = 0;
   const unit = {
     type: UnitType.ASYNC,
-    kind: UnitKind.PURE,
+    kind: UnitKind.METHODIC,
     scope,
     branches,
+    work: method,
     get state() {
       return duration === 0 ? UnitState.RESOLVED : UnitState.PENDING;
     },
@@ -171,6 +172,7 @@ const fromAsyncProcedure = (procedure, init, branches) => {
     kind: UnitKind.PROCEDURAL,
     scope,
     branches,
+    work: procedure,
     get state() {
       return duration === 0 ? UnitState.RESOLVED : UnitState.PENDING;
     },
@@ -218,16 +220,25 @@ const fromSyncMethod = (method, init, branches) => {
   };
   const unit = {
     type: UnitType.SYNC,
-    kind: UnitKind.PURE,
+    kind: UnitKind.METHODIC,
     scope,
     branches,
+    work: method,
     next: (input) => {
       scope._extend(input);
-      const output2 = method(scope, branches, unit);
+      const output2 = method(
+        scope,
+        branches,
+        unit
+      );
       return onComplete(output2);
     }
   };
-  const output = method(scope, branches, unit);
+  const output = method(
+    scope,
+    branches,
+    unit
+  );
   onComplete(output);
   return unit;
 };
@@ -247,6 +258,7 @@ const fromSyncProcedure = (procedure, init, branches) => {
     kind: UnitKind.PROCEDURAL,
     scope,
     branches,
+    work: procedure,
     next: (input) => {
       scope._extend(input);
       if (lastFrame.done) {
@@ -271,7 +283,13 @@ const fromSyncProcedure = (procedure, init, branches) => {
   return unit;
 };
 
+const reassignUnit = (unit, newUnit) => {
+  unit.kind = newUnit.kind;
+  if (unit.type === UnitType.ASYNC)
+    unit.future = newUnit.future;
+};
 const fromKey = (key, init, branches) => {
+  let parentUnit;
   let scheme = () => {
   };
   const getScheme = (props) => {
@@ -290,15 +308,17 @@ const fromKey = (key, init, branches) => {
       if (!Object.is(currentScheme, scheme)) {
         scheme = currentScheme;
         unit2 = createUnit(scheme, props, ...branches2);
+        reassignUnit(parentUnit, unit2);
       } else {
         unit2?.next(result);
       }
       output = unit2.scope.chain[2];
     }
   };
-  return createUnit(procedure, init, ...branches);
+  return parentUnit = createUnit(procedure, init, ...branches);
 };
 const fromKeyAsync = (key, init, branches) => {
+  let parentUnit;
   let scheme = () => {
   };
   const getScheme = (props) => {
@@ -317,6 +337,7 @@ const fromKeyAsync = (key, init, branches) => {
       if (!Object.is(currentScheme, scheme)) {
         scheme = currentScheme;
         unit2 = createUnit(scheme, props, ...branches2);
+        reassignUnit(parentUnit, unit2);
         await unit2.future;
       } else {
         await unit2?.next(result);
@@ -324,7 +345,7 @@ const fromKeyAsync = (key, init, branches) => {
       output = unit2.scope.chain[2];
     }
   };
-  return createUnit(procedure, init, ...branches);
+  return parentUnit = createUnit(procedure, init, ...branches);
 };
 
 const createUnit = (method, init, ...branches) => {
@@ -334,11 +355,23 @@ const createUnit = (method, init, ...branches) => {
     }
     return fromKey(method, init, branches);
   } else if (isAsyncGenerator(method)) {
-    return fromAsyncProcedure(method, init, branches);
+    return fromAsyncProcedure(
+      method,
+      init,
+      branches
+    );
   } else if (isGenerator(method)) {
-    return fromSyncProcedure(method, init, branches);
+    return fromSyncProcedure(
+      method,
+      init,
+      branches
+    );
   } else if (isAsync(method)) {
-    return fromAsyncMethod(method, init, branches);
+    return fromAsyncMethod(
+      method,
+      init,
+      branches
+    );
   } else {
     return fromSyncMethod(
       method,
@@ -515,10 +548,13 @@ const createElement = function* (props, branches, self) {
   while (true) {
     const frame = yield output;
     if (frame.type === "event") {
-      props[`on${frame.event}`]?.(frame.payload, child);
+      props[`on${frame.event}`]?.(
+        frame.payload,
+        child
+      );
     }
     if (frame.type === "update") {
-      props.onUpdate?.(frame.payload, child);
+      props.onUpdate?.(frame.payload, self);
     }
     output = void 0;
   }
